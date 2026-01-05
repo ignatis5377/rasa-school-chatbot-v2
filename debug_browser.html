@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Raw SocketIO Debugger</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+        }
+
+        #log {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+
+        .sent {
+            color: blue;
+        }
+
+        .received {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .system {
+            color: gray;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>🤖 Rasa Connection Debugger</h2>
+    <div>Status: <span id="status" class="error">Disconnected</span></div>
+    <div id="log"></div>
+    <input type="text" id="userInput" placeholder="Type a message (e.g. 'γεια')" style="width: 70%;">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = io("http://localhost:5005", {
+            transports: ["websocket", "polling"] // Force try websocket first
+        });
+
+        const logDiv = document.getElementById('log');
+        const statusSpan = document.getElementById('status');
+
+        // Generates a random session ID
+        const sessionId = "debug_user_" + Math.floor(Math.random() * 1000);
+
+        function log(msg, type = 'system') {
+            logDiv.innerHTML += `<div class="${type}">${msg}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        socket.on("connect", () => {
+            statusSpan.innerText = "Connected!";
+            statusSpan.className = "received";
+            log(`Connected as ${sessionId}`);
+            // Often helpful to announce the user_uttered immediately or wait for input
+        });
+
+        socket.on("connect_error", (err) => {
+            statusSpan.innerText = "Error";
+            statusSpan.className = "error";
+            log("Connection Error: " + err, "error");
+        });
+
+        socket.on("disconnect", () => {
+            statusSpan.innerText = "Disconnected";
+            statusSpan.className = "error";
+            log("Disconnected", "system");
+        });
+
+        // Listen for Bot Messages (Standard Rasa Event)
+        socket.on("bot_uttered", (data) => {
+            console.log("Received:", data);
+            let text = data.text || "[No Text]";
+            if (data.attachment) text += " [Attachment]";
+            log("Bot: " + text, "received");
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value;
+            if (!message) return;
+
+            // Emit User Message (Standard Rasa Event)
+            socket.emit("user_uttered", {
+                "message": message,
+                "session_id": sessionId
+            });
+
+            log("You: " + message, "sent");
+            input.value = "";
+        }
+
+        // Allow Enter key
+        document.getElementById("userInput").addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+
+</html>

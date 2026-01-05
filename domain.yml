@@ -1,0 +1,203 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - bot_challenge
+  - faq_contact_hours
+  - faq_contact_details
+  - faq_contact_person
+  - faq_parent_briefing
+  - faq_model_exams_applications
+  - faq_model_exams_process
+  - faq_model_exams_runners_up
+  - faq_attendance_info
+  - faq_absences
+  - faq_remedial_teaching
+  - create_exam
+  - search_website
+
+  - subject
+  - grade
+  - difficulty
+  - num_questions
+  - query
+  - upload_exam_material
+  - inform_file_path
+
+entities:
+  - subject
+  - grade
+  - difficulty
+  - num_questions
+  - query
+  - file_path
+
+slots:
+  query:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: query
+
+  subject:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: subject
+    - type: from_text
+      conditions:
+      - active_loop: exam_form
+        requested_slot: subject
+      - active_loop: upload_exam_form
+        requested_slot: subject
+  
+  grade:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: grade
+    - type: from_text
+      conditions:
+      - active_loop: exam_form
+        requested_slot: grade
+      - active_loop: upload_exam_form
+        requested_slot: grade
+
+  include_answers:
+    type: bool
+    mappings:
+    - type: from_entity
+      entity: include_answers
+    - type: from_intent
+      intent: affirm
+      value: true
+    - type: from_intent
+      intent: deny
+      value: false
+    - type: from_text
+      conditions:
+      - active_loop: exam_form
+        requested_slot: include_answers
+
+  upload_file_path:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: file_path
+    - type: from_text # Allow user to just type the path when asked
+      conditions:
+      - active_loop: upload_exam_form
+        requested_slot: upload_file_path
+
+  difficulty:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: difficulty
+    - type: from_text
+      conditions:
+      - active_loop: exam_form
+        requested_slot: difficulty
+      - active_loop: upload_exam_form
+        requested_slot: difficulty
+
+  num_questions:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: num_questions
+
+  role:
+    type: text
+    mappings:
+    - type: from_text  # Will be set via metadata or custom action logic
+
+forms:
+  exam_form:
+    required_slots:
+        - subject
+        - grade
+        - difficulty
+        - num_questions
+        - include_answers
+
+  upload_exam_form:
+    required_slots:
+        - upload_file_path
+        - subject
+        - grade
+        - difficulty
+    
+responses:
+  utter_greet:
+  - text: "Γειά σας! Πώς μπορώ να βοηθήσω σήμερα;"
+  
+  utter_goodbye:
+  - text: "Αντίο! Ελπίζω να βοήθησα."
+
+  utter_iamabot:
+  - text: "Είμαι ένα αυτοματοποιημένο σύστημα υποστήριξης (chatbot) του σχολείου."
+
+  utter_contact_info:
+  - text: "Μπορείτε να επικοινωνήσετε μαζί μας στο τηλέφωνο 210-1234567 ή στο email info@school.gr. Ώρες γραμματείας: 08:00 - 14:00."
+
+  utter_absences_info:
+  - text: "Οι απουσίες δικαιολογούνται εντός 10 ημερών με ιατρική βεβαίωση ή υπεύθυνη δήλωση κηδεμόνα."
+
+  utter_school_calendar:
+  - text: "Τα σχολεία κλείνουν για Χριστούγεννα στις 23/12 και για Πάσχα τη Μεγάλη Δευτέρα. Το διδακτικό έτος λήγει 30 Ιουνίου."
+
+  utter_ask_num_questions:
+  - text: "Πόσες ερωτήσεις θέλετε να έχει το διαγώνισμα;"
+
+  utter_ask_difficulty:
+  - text: "Τι βαθμό δυσκολίας επιθυμείτε (Εύκολο, Μέτριο, Δύσκολο);"
+
+  utter_ask_grade:
+  - text: "Για ποια τάξη (π.χ. Α Γυμνασίου);"
+
+  utter_ask_include_answers:
+  - text: "Θέλετε να συμπεριληφθούν οι απαντήσεις;"
+
+  utter_ask_upload_file_path:
+  - text: "Παρακαλώ δώστε μου το μονοπάτι του αρχείου (π.χ. C:/docs/test.pdf)."
+
+  # Specific Prompts for Upload Form (to distinguish from Creation)
+  utter_ask_upload_exam_form_subject:
+  - text: "Για ποιο μάθημα είναι το αρχείο που ανεβάζετε;"
+
+  utter_ask_upload_exam_form_grade:
+  - text: "Σε ποια τάξη απευθύνεται το υλικό;"
+
+  utter_ask_upload_exam_form_difficulty:
+  - text: "Ποιος είναι ο βαθμός δυσκολίας του υλικού;"
+
+  utter_ask_subject:
+  - text: "Για ποιο μάθημα ενδιαφέρεστε;"
+
+  # Static FAQ Responses
+  utter_faq_contact_hours:
+  - text: "Λειτουργία Γραμματείας από 08.00πμ έως 1.40μμ (η λειτουργία υποστηρίζεται με πρόσθετη εργασία εκπαιδευτικών του σχολείου και γι΄αυτό ζητούμε την κατανόησή σας)."
+
+  utter_faq_contact_details:
+  - text: |
+      Παρακάτω μπορείτε να δείτε όλα τα στοιχεία επικοινωνίας του σχολείου:
+      - Διεύθυνση: Ερμού 2
+      - Τηλέφωνο: 22510 22222
+      - Fax: 22510 22333
+      - Email: gymnasio@sch.gr
+
+  utter_faq_contact_person:
+  - text: "Υπεύθυνος Γραμματείας είναι ο εκπαιδευτικός Λασκαρίδης Ιγνάτιος."
+
+actions:
+  - action_create_exam_new
+  - action_search_articles
+  - action_smart_faq
+  - action_upload_exam_material
+
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

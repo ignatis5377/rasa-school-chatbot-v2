@@ -1,0 +1,116 @@
+version: "3.1"
+
+rules:
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Say 'I am a bot' anytime the user challenges
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: Answer contact info
+  steps:
+  - intent: ask_contact_info
+  - action: utter_contact_info
+
+- rule: Answer absences info
+  steps:
+  - intent: ask_absences_info
+  - action: utter_absences_info
+
+- rule: Answer school calendar
+  steps:
+  - intent: ask_school_calendar
+  - action: utter_school_calendar
+
+- rule: Activate Exam Form
+  steps:
+  - intent: create_exam
+  - action: exam_form
+  - active_loop: exam_form
+
+- rule: Submit Exam Form
+  condition:
+  - active_loop: exam_form
+  steps:
+  - action: exam_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_create_exam_new
+
+- rule: Activate Upload Form
+  steps:
+  - intent: upload_exam_material
+  - action: upload_exam_form
+  - active_loop: upload_exam_form
+
+- rule: Submit Upload Form
+  condition:
+  - active_loop: upload_exam_form
+  steps:
+  - action: upload_exam_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_upload_exam_material
+
+- rule: Search Website
+  steps:
+  - intent: search_website
+  - action: action_search_articles
+
+- rule: Respond to FAQ Contact Hours
+  steps:
+  - intent: faq_contact_hours
+  - action: utter_faq_contact_hours
+
+- rule: Respond to FAQ Contact Details
+  steps:
+  - intent: faq_contact_details
+  - action: utter_faq_contact_details
+
+- rule: Respond to FAQ Contact Person
+  steps:
+  - intent: faq_contact_person
+  - action: utter_faq_contact_person
+
+- rule: Respond to Smart FAQs (Parent Briefing)
+  steps:
+  - intent: faq_parent_briefing
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Model Exams Applications)
+  steps:
+  - intent: faq_model_exams_applications
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Model Exams Process)
+  steps:
+  - intent: faq_model_exams_process
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Model Exams Runners Up)
+  steps:
+  - intent: faq_model_exams_runners_up
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Attendance Info)
+  steps:
+  - intent: faq_attendance_info
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Absences)
+  steps:
+  - intent: faq_absences
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Remedial Teaching)
+  steps:
+  - intent: faq_remedial_teaching
+  - action: action_smart_faq
+

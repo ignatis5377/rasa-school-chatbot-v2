@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Chatbot Test (Botfront Widget)</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Testing Chatbot Connection...</h1>
+    <p>Open the chat widget at the bottom right.</p>
+
+    <script>!(function () {
+            let e = document.createElement("script"),
+                t = document.head || document.getElementsByTagName("head")[0];
+            (e.src = "https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.1/lib/index.js"),
+                (e.async = !0),
+                (e.onload = () => {
+                    window.WebChat.default(
+                        {
+                            selector: "#webchat",
+                            initPayload: "/greet",
+                            customData: { "language": "el" },
+                            socketUrl: "http://localhost:5005",
+                            socketPath: "/socket.io/",
+                            title: "Digital School Assistant",
+                            subtitle: "Ask me anything!",
+                        },
+                        null
+                    );
+                }),
+                t.insertBefore(e, t.firstChild);
+        })();
+    </script>
+</body>
+
+</html>

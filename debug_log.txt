@@ -1,0 +1,185 @@
+
+--- New Upload Attempt ---
+RAW: 'C:'
+SANITIZED: 'C:'
+IsDOCX: False
+Exists: True
+
+--- New Upload Attempt ---
+RAW: 'C:'
+SANITIZED: 'C:'
+IsDOCX: False
+Exists: True
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Easy_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Easy_1.docx'
+IsDOCX: True
+Exists: True
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Easy_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Easy_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_B_Easy_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Medium_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Medium_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_B_Medium_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_A_Difficult_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_A_Difficult_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_A_Difficult_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 5
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_A_Easy_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_A_Easy_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_A_Easy_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 5
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_A_Medium_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_A_Medium_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_A_Medium_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 5
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Difficult_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Difficult_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_B_Difficult_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Easy_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Easy_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_B_Easy_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Medium_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_B_Medium_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_B_Medium_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_C_Difficult_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_C_Difficult_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_C_Difficult_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 5
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_C_Easy_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_C_Easy_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_C_Easy_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 4
+MATCH A: ΑΠΑΝΤΗΣΗ
+
+--- New Upload Attempt ---
+RAW: 'C:\\RasaFinalProject\\files_to_upload\\Math_C_Medium_1.docx'
+SANITIZED: 'C:\\RasaFinalProject\\files_to_upload\\Math_C_Medium_1.docx'
+IsDOCX: True
+Exists: True
+--- Parsing Doc: Math_C_Medium_1.docx ---
+MATCH Q: ΕΡΩΤΗΣΗ 1
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 2
+MATCH A: ΑΠΑΝΤΗΣΗ
+MATCH Q: ΕΡΩΤΗΣΗ 3
+MATCH A: ΑΠΑΝΤΗΣΗ
