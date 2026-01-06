@@ -84,22 +84,32 @@ def check_user_access(tracker: Tracker) -> bool:
     Checks if the user is authenticated via Metadata sent from the Frontend.
     Returns True if allowed, False otherwise.
     """
-    # 1. Get Metadata from the latest user message
+    # 1. Check latest message first (Fastest)
     metadata = tracker.latest_message.get("metadata", {})
-    # Note: socketio channel often nests customData inside metadata
-    # Structure might be: {'customData': {'role': 'member'}, ...}
-    
-    # Try to find 'role' or 'username' in metadata or nested customData
     user_data = metadata.get("customData", {}) or metadata
     
-    role = user_data.get("role")
-    username = user_data.get("username")
+    print(f"DEBUG AUTH (Latest): Role={user_data.get('role')}, User={user_data.get('username')}")
     
-    print(f"DEBUG AUTH: Metadata={metadata}, Role={role}, Username={username}")
-    
-    if role == "member" or username:
+    if user_data.get("role") == "member" or user_data.get("username"):
         return True
-    
+
+    # 2. Deep Scan: Check session history (Crucial for Webchat)
+    # Webchat often sends metadata only ONCE at the start.
+    print("DEBUG AUTH: Scanning history for metadata...")
+    for event in reversed(tracker.events):
+        # Check 'user' events and 'session_started' events
+        evt_metadata = event.get("metadata", {})
+        if not evt_metadata: continue
+        
+        evt_user_data = evt_metadata.get("customData", {}) or evt_metadata
+        role = evt_user_data.get("role")
+        username = evt_user_data.get("username")
+        
+        if role == "member" or username:
+            print(f"DEBUG AUTH: Found auth in history! Role={role}")
+            return True
+            
+    print("DEBUG AUTH: No auth found in history.")
     return False
 
 def extract_questions_from_pdf(file_path: Text) -> List[Dict]:
