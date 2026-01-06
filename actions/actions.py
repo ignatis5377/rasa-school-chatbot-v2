@@ -69,13 +69,22 @@ init_db()
 # Register Greek Font (DejaVu)
 try:
     font_path = "fonts/DejaVuSans.ttf"
+    bold_font_path = "fonts/DejaVuSans-Bold.ttf"
     if os.path.exists(font_path):
         pdfmetrics.registerFont(TTFont('GreekFont', font_path))
         print("DEBUG: Loaded DejaVuSans font successfully.")
+        
+        if os.path.exists(bold_font_path):
+             pdfmetrics.registerFont(TTFont('GreekFont-Bold', bold_font_path))
+             print("DEBUG: Loaded DejaVuSans-Bold font successfully.")
+        else:
+             print("DEBUG: Bold font not found, falling back to regular.")
+             pdfmetrics.registerFont(TTFont('GreekFont-Bold', font_path))
     else:
         # Fallback to Arial if download failed, though likely to box
         print("DEBUG: DejaVuSans not found. Trying C:/Windows/Fonts/arial.ttf")
         pdfmetrics.registerFont(TTFont('GreekFont', "C:/Windows/Fonts/arial.ttf"))
+        pdfmetrics.registerFont(TTFont('GreekFont-Bold', "C:/Windows/Fonts/arial.ttf"))
 except Exception as e:
     print(f"DEBUG: Failed to load font: {e}")
 
