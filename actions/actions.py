@@ -68,23 +68,38 @@ init_db()
 
 # Register Greek Font (DejaVu)
 try:
-    font_path = "fonts/DejaVuSans.ttf"
-    bold_font_path = "fonts/DejaVuSans-Bold.ttf"
-    if os.path.exists(font_path):
+    # Try Docker Path first, then Local Relative Path
+    font_paths_to_try = ["/app/fonts/DejaVuSans.ttf", "fonts/DejaVuSans.ttf"]
+    font_path = None
+    
+    for p in font_paths_to_try:
+        if os.path.exists(p):
+            font_path = p
+            break
+            
+    if font_path:
         pdfmetrics.registerFont(TTFont('GreekFont', font_path))
-        print("DEBUG: Loaded DejaVuSans font successfully.")
+        print(f"DEBUG: Loaded GreekFont from {font_path}")
         
-        if os.path.exists(bold_font_path):
-             pdfmetrics.registerFont(TTFont('GreekFont-Bold', bold_font_path))
-             print("DEBUG: Loaded DejaVuSans-Bold font successfully.")
+        # Determine Bold Path based on found Regular Path
+        base_dir = os.path.dirname(font_path)
+        bold_path = os.path.join(base_dir, "DejaVuSans-Bold.ttf")
+        
+        if os.path.exists(bold_path):
+             pdfmetrics.registerFont(TTFont('GreekFont-Bold', bold_path))
+             print(f"DEBUG: Loaded GreekFont-Bold from {bold_path}")
         else:
-             print("DEBUG: Bold font not found, falling back to regular.")
+             print("DEBUG: Bold font not found, falling back to regular for Bold.")
              pdfmetrics.registerFont(TTFont('GreekFont-Bold', font_path))
     else:
-        # Fallback to Arial if download failed, though likely to box
-        print("DEBUG: DejaVuSans not found. Trying C:/Windows/Fonts/arial.ttf")
-        pdfmetrics.registerFont(TTFont('GreekFont', "C:/Windows/Fonts/arial.ttf"))
-        pdfmetrics.registerFont(TTFont('GreekFont-Bold', "C:/Windows/Fonts/arial.ttf"))
+        # Fallback for Windows Local Dev ONLY
+        print("DEBUG: DejaVuSans not found in standard paths.")
+        if os.path.exists("C:/Windows/Fonts/arial.ttf"):
+             print("DEBUG: Loading Arial from Windows.")
+             pdfmetrics.registerFont(TTFont('GreekFont', "C:/Windows/Fonts/arial.ttf"))
+             pdfmetrics.registerFont(TTFont('GreekFont-Bold', "C:/Windows/Fonts/arial.ttf"))
+        else:
+             print("ERROR: No suitable font found!")
 except Exception as e:
     print(f"DEBUG: Failed to load font: {e}")
 
@@ -623,7 +638,8 @@ class ActionCreateExamNew(Action):
             answers_text = []
             
             # Check explicitly for affirmative values
-            show_answers = str(include_answers).lower() in ['true', 'yes', 'nai', 'ναι', 'βέβαια', 'y']
+        show_answers = str(include_answers).lower() in ['true', 'yes', 'nai', 'ναι', 'βέβαια', 'y']
+        print(f"DEBUG ANSWERS: Slot='{include_answers}', Show={show_answers}, RowsWithAnswers={len([r for r in rows if r['answer_text']])}")
             
             for i, row in enumerate(rows, 1):
                 question_text = row['question_text']
