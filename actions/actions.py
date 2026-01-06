@@ -638,8 +638,8 @@ class ActionCreateExamNew(Action):
             answers_text = []
             
             # Check explicitly for affirmative values
-        show_answers = str(include_answers).lower() in ['true', 'yes', 'nai', 'ναι', 'βέβαια', 'y']
-        print(f"DEBUG ANSWERS: Slot='{include_answers}', Show={show_answers}, RowsWithAnswers={len([r for r in rows if r['answer_text']])}")
+            show_answers = str(include_answers).lower() in ['true', 'yes', 'nai', 'ναι', 'βέβαια', 'y']
+            print(f"DEBUG ANSWERS: Slot='{include_answers}', Show={show_answers}, RowsWithAnswers={len([r for r in rows if r['answer_text']])}")
             
             for i, row in enumerate(rows, 1):
                 question_text = row['question_text']
