@@ -96,7 +96,13 @@ def check_user_access(tracker: Tracker) -> bool:
     # 2. Deep Scan: Check session history (Crucial for Webchat)
     # Webchat often sends metadata only ONCE at the start.
     print("DEBUG AUTH: Scanning history for metadata...")
-    for event in reversed(tracker.events):
+    for i, event in enumerate(reversed(tracker.events)):
+        # DEBUG: Print every event to see what's going on
+        evt_type = event.get("event")
+        evt_meta = event.get("metadata")
+        if evt_meta:
+             print(f"DEBUG EVENT [{i}] {evt_type}: HAS METADATA: {evt_meta}")
+        
         # Check 'user' events and 'session_started' events
         evt_metadata = event.get("metadata", {})
         if not evt_metadata: continue
