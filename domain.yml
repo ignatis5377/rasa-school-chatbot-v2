@@ -32,6 +32,8 @@ entities:
   - num_questions
   - query
   - file_path
+  - role
+  - username
 
 slots:
   query:
@@ -111,7 +113,14 @@ slots:
   role:
     type: text
     mappings:
-    - type: from_text  # Will be set via metadata or custom action logic
+    - type: from_entity
+      entity: role
+
+  username:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: username
 
 forms:
   exam_form:
