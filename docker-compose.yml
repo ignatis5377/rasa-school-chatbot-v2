@@ -30,6 +30,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      - ./files:/usr/share/nginx/html/files
     depends_on:
       - rasa
 

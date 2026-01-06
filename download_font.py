@@ -19,5 +19,8 @@ def download_file(url, dest_folder, filename):
         print(f"Error downloading: {e}")
 
 # URL for DejaVuSans (Reliable for Greek)
-font_url = "https://github.com/dejavu-fonts/dejavu-fonts/raw/master/ttf/DejaVuSans.ttf"
-download_file(font_url, "fonts", "DejaVuSans.ttf")
+# Updated URL to raw.githubusercontent.com for reliability
+FONT_URL = "https://raw.githubusercontent.com/dejavu-fonts/dejavu-fonts/master/ttf/DejaVuSans.ttf"
+OUTPUT_DIR = "fonts"
+OUTPUT_FILE = os.path.join(OUTPUT_DIR, "DejaVuSans.ttf")
+download_file(FONT_URL, OUTPUT_DIR, os.path.basename(OUTPUT_FILE))
