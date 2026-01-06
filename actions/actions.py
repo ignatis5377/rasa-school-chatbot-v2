@@ -309,6 +309,12 @@ class ActionUploadExamMaterial(Action):
         return "action_upload_exam_material"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # --- AUTH CHECK ---
+        if not check_user_access(tracker):
+            dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες. Παρακαλώ συνδεθείτε στην ιστοσελίδα!")
+            return []
+        # ------------------
+
         file_path = tracker.get_slot("upload_file_path")
         
         # Sanitize File Path (Remove quotes if user added them)
@@ -421,6 +427,12 @@ class ActionCreateExamNew(Action):
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # --- AUTH CHECK ---
+        if not check_user_access(tracker):
+            dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες. Παρακαλώ συνδεθείτε στην ιστοσελίδα!")
+            return []
+        # ------------------
 
         print("DEBUG: Entered ActionCreateExam - IF YOU SEE THIS, IT WORKS")
 
