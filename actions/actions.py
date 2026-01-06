@@ -663,8 +663,8 @@ class ActionCreateExamNew(Action):
                 match = re.search(r'[\n\s]([ΑΒΓΔΕ])$', question_text)
                 if not answer and match:
                     answer = match.group(1)
-                    # Optional: Remove it from question to clean up? 
-                    # question_text = question_text[:match.start()]
+                    # Remove the answer letter from the question text to avoid artifacts
+                    question_text = question_text[:match.start()]
                     print(f"DEBUG: Extracted answer '{answer}' from text for Q{i}")
                 # ---------------------------------------
 
