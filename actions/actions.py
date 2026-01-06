@@ -613,56 +613,74 @@ class ActionCreateExamNew(Action):
                 # Page Break Check
                 if y_position < 150:
                     c.showPage()
-                    c.setFont("GreekFont", 12)
-                    y_position = height - 50
-                
-                # Question Text Handling (Multiline support)
-            # Helper for simple text wrapping
-            def simpleSplit(text, font_name, font_size, max_width):
+            import re
+            # Helper for simple text wrapping with Newline support
+            def draw_multiline_text(c, text, x, start_y, font_name, font_size, max_width):
+                if not text: return start_y
                 c.setFont(font_name, font_size)
-                lines = []
-                if not text: return [""]
                 
-                words = text.split(' ')
-                current_line = []
-                for word in words:
-                    test_line = ' '.join(current_line + [word])
-                    if c.stringWidth(test_line, font_name, font_size) < max_width:
-                        current_line.append(word)
-                    else:
-                        lines.append(' '.join(current_line))
-                        current_line = [word]
-                lines.append(' '.join(current_line))
-                return lines
+                # 1. Clean up weird chars (Fix for Squares)
+                text = text.replace('\r', '').replace('\t', ' ')
+                
+                # 2. Split by explicit newlines first
+                paragraphs = text.split('\n')
+                
+                current_y = start_y
+                
+                for paragraph in paragraphs:
+                    words = paragraph.split(' ')
+                    current_line = []
+                    for word in words:
+                        # Check word width
+                        test_line = ' '.join(current_line + [word])
+                        if c.stringWidth(test_line, font_name, font_size) < max_width:
+                            current_line.append(word)
+                        else:
+                            # Draw current line
+                            c.drawString(x, current_y, ' '.join(current_line))
+                            current_y -= (font_size + 4) # Line spacing
+                            current_line = [word]
+                    
+                    # Draw remaining part of paragraph
+                    if current_line:
+                        c.drawString(x, current_y, ' '.join(current_line))
+                        current_y -= (font_size + 4)
+                        
+                return current_y
 
             answers_text = []
             
             # Check explicitly for affirmative values
             show_answers = str(include_answers).lower() in ['true', 'yes', 'nai', 'ναι', 'βέβαια', 'y']
-            print(f"DEBUG ANSWERS: Slot='{include_answers}', Show={show_answers}, RowsWithAnswers={len([r for r in rows if r['answer_text']])}")
+            print(f"DEBUG ANSWERS: Slot='{include_answers}', Show={show_answers}")
             
             for i, row in enumerate(rows, 1):
                 question_text = row['question_text']
-                # Clean up newlines for PDF
-                # question_text = question_text.replace('\n', ' ')
+                answer = row['answer_text']
                 
+                # --- HEURISTIC: Fix embedded answers ---
+                # Check if question ends with a single letter like " A" or "\nB"
+                match = re.search(r'[\n\s]([ΑΒΓΔΕ])$', question_text)
+                if not answer and match:
+                    answer = match.group(1)
+                    # Optional: Remove it from question to clean up? 
+                    # question_text = question_text[:match.start()]
+                    print(f"DEBUG: Extracted answer '{answer}' from text for Q{i}")
+                # ---------------------------------------
+
                 # Add Question Label
                 header = f"Ερώτηση {i}:"
                 c.setFont("GreekFont-Bold", 12)
                 c.drawString(50, y_position, header)
                 y_position -= 20
                 
-                c.setFont("GreekFont", 12)
-                # Simple wrapping logic
-                wrapped_text = simpleSplit(question_text, "GreekFont", 12, width - 100)
-                for line in wrapped_text:
-                    c.drawString(50, y_position, line)
-                    y_position -= 20
+                # Draw Question Body
+                y_position = draw_multiline_text(c, question_text, 50, y_position, "GreekFont", 12, width - 100)
                     
                 y_position -= 20
                 
-                if row['answer_text']: # Changed from 'correct_answer' to 'answer_text' based on schema
-                    answers_text.append(f"Απάντηση {i}: {row['answer_text']}")
+                if answer:
+                    answers_text.append(f"Απάντηση {i}: {answer}")
                 
                 # Image Rendering
                 if row['image_path'] and os.path.exists(row['image_path']):
