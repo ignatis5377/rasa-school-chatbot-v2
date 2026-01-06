@@ -21,6 +21,12 @@ services:
       - ./fonts:/app/fonts
       - ./actions:/app/actions
     restart: always
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./config.yml:/app/config.yml
+      - ./domain.yml:/app/domain.yml
+      - ./credentials.yml:/app/credentials.yml
 
   nginx:
     image: nginx:latest
