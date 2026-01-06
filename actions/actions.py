@@ -627,7 +627,7 @@ class ActionCreateExamNew(Action):
             file_name = os.path.basename(filepath)
             public_url = f"https://104.155.53.205.nip.io/files/generated_exams/{file_name}"
             
-            dispatcher.utter_message(text=f"Το διαγώνισμα δημιουργήθηκε!\n\n{public_url}")
+            dispatcher.utter_message(text=f"Το διαγώνισμα δημιουργήθηκε! (v2 Security Check)\n\n{public_url}")
             
         except Exception as e:
             dispatcher.utter_message(text=f"Σφάλμα PDF: {e}")
