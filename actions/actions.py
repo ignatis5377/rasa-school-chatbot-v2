@@ -79,6 +79,29 @@ try:
 except Exception as e:
     print(f"DEBUG: Failed to load font: {e}")
 
+def check_user_access(tracker: Tracker) -> bool:
+    """
+    Checks if the user is authenticated via Metadata sent from the Frontend.
+    Returns True if allowed, False otherwise.
+    """
+    # 1. Get Metadata from the latest user message
+    metadata = tracker.latest_message.get("metadata", {})
+    # Note: socketio channel often nests customData inside metadata
+    # Structure might be: {'customData': {'role': 'member'}, ...}
+    
+    # Try to find 'role' or 'username' in metadata or nested customData
+    user_data = metadata.get("customData", {}) or metadata
+    
+    role = user_data.get("role")
+    username = user_data.get("username")
+    
+    print(f"DEBUG AUTH: Metadata={metadata}, Role={role}, Username={username}")
+    
+    if role == "member" or username:
+        return True
+    
+    return False
+
 def extract_questions_from_pdf(file_path: Text) -> List[Dict]:
     """
     Parses a PDF file and extracts questions/answers with Grade detection.
