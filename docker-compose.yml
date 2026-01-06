@@ -19,6 +19,7 @@ services:
       - ./data:/app/data
       - ./files:/app/files
       - ./fonts:/app/fonts
+      - ./actions:/app/actions
     restart: always
 
   nginx:
