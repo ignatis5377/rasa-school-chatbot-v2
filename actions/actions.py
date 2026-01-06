@@ -593,23 +593,51 @@ class ActionCreateExamNew(Action):
                     y_position = height - 50
                 
                 # Question Text Handling (Multiline support)
-                raw_q = f"{idx}. {row['question_text']}"
-                sanitized_q = sanitize_text(raw_q)
-                lines = sanitized_q.split('\n')
+            # Helper for simple text wrapping
+            def simpleSplit(text, font_name, font_size, max_width):
+                c.setFont(font_name, font_size)
+                lines = []
+                if not text: return [""]
                 
-                for line in lines:
-                    # Very basic wrap
-                    max_chars = 85
-                    while len(line) > max_chars:
-                        chunk = line[:max_chars]
-                        c.drawString(50, y_position, chunk)
-                        y_position -= 15
-                        line = line[max_chars:]
-                    
+                words = text.split(' ')
+                current_line = []
+                for word in words:
+                    test_line = ' '.join(current_line + [word])
+                    if c.stringWidth(test_line, font_name, font_size) < max_width:
+                        current_line.append(word)
+                    else:
+                        lines.append(' '.join(current_line))
+                        current_line = [word]
+                lines.append(' '.join(current_line))
+                return lines
+
+            answers_text = []
+            
+            # Check explicitly for affirmative values
+            show_answers = str(include_answers).lower() in ['true', 'yes', 'nai', 'ναι', 'βέβαια', 'y']
+            
+            for i, row in enumerate(rows, 1):
+                question_text = row['question_text']
+                # Clean up newlines for PDF
+                # question_text = question_text.replace('\n', ' ')
+                
+                # Add Question Label
+                header = f"Ερώτηση {i}:"
+                c.setFont("GreekFont-Bold", 12)
+                c.drawString(50, y_position, header)
+                y_position -= 20
+                
+                c.setFont("GreekFont", 12)
+                # Simple wrapping logic
+                wrapped_text = simpleSplit(question_text, "GreekFont", 12, width - 100)
+                for line in wrapped_text:
                     c.drawString(50, y_position, line)
-                    y_position -= 15
+                    y_position -= 20
+                    
+                y_position -= 20
                 
-                y_position -= 5
+                if row['answer_text']: # Changed from 'correct_answer' to 'answer_text' based on schema
+                    answers_text.append(f"Απάντηση {i}: {row['answer_text']}")
                 
                 # Image Rendering
                 if row['image_path'] and os.path.exists(row['image_path']):
