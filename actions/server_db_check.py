@@ -8,17 +8,20 @@ import os
 DB_PATH = "/app/data/questions.db" 
 
 def inspect():
-    print(f"🔍 Checking DB at: {DB_PATH}")
-    if not os.path.exists(DB_PATH):
-        print(f"❌ Database not found at {DB_PATH}")
+    # Use a local variable to avoid UnboundLocalError
+    target_db = DB_PATH
+    print(f"🔍 Checking DB at: {target_db}")
+    
+    if not os.path.exists(target_db):
+        print(f"❌ Database not found at {target_db}")
         # Try relative just in case
         if os.path.exists("data/questions.db"):
              print("⚠️ Found at relative path 'data/questions.db' instead.")
-             DB_PATH = "data/questions.db"
+             target_db = "data/questions.db"
         else:
              return
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(target_db)
     c = conn.cursor()
     
     print("\n--- 🔍 INSPECTING LAST 10 QUESTIONS ---")
