@@ -92,58 +92,11 @@ add_action('wp_footer', 'add_chatbot_user_data', 5);
 </script>
 ```
 
-### Πώς να αλλάξω το εικονίδιο (Avatar);
-
-Αν θέλετε και δικό σας εικονίδιο:
-1.  Ονομάστε την εικόνα σας `logo.png`
-2.  Ανεβάστε την στον φάκελο `files/` του Server (όπως ανεβάζετε τα διαγωνίσματα, αλλά με SFTP ή μέσω του terminal).
-    *   *Εναλλακτικά:* Ανεβάστε την στο WordPress Media Library και πάρτε το URL από εκεί.
-
-3.  Προσθέστε αυτή τη γραμμή στον κώδικα του Widget:
-
-```javascript
-      window.WebChat.default(
-        {
-          initPayload: payload,
-          socketUrl: "https://104.155.53.205.nip.io",
-          profileAvatar: "https://104.155.53.205.nip.io/files/logo.png", // <--- ΝΕΑ ΓΡΑΜΜΗ
-          customData: { 
-              "role": userRole, 
-              "username": userName
-          },
-          title: "Ο Βοηθός του Σχολείου",
-          // ... υπόλοιπος κώδικας ...
-```
-
 ### Τι πετύχαμε:
 1.  Αν είσαι Guest -> `role: 'guest'` -> Το Bot απαγορεύει τα διαγωνίσματα.
 2.  Αν είσαι Login -> `role: 'member'` -> Το Bot επιτρέπει τα πάντα!
-3.  Το Bot έχει το δικό του Λογότυπο!
 
-
-### Πώς να αλλάξω ΚΑΙ το Κουμπί (τη "Φυσαλίδα");
-
-Το προηγούμενο βήμα αλλάζει την εικόνα *μέσα* στη συνομιλία. Αν θέλετε να αλλάξει και το μπλε κουμπί κάτω δεξιά:
-
-1.  Στο WordPress, πηγαίνετε: **Εμφάνιση (Appearance)** -> **Προσαρμογή (Customize)**.
-2.  Κάτω-κάτω, επιλέξτε **Πρόσθετο CSS (Additional CSS)**.
-3.  Επικολλήστε αυτόν τον κώδικα:
-
-```css
-/* Αλλαγή Εικονιδίου Chatbot Launcher */
-.rw-launcher {
-    background-image: url('https://104.155.53.205.nip.io/files/logo.png') !important;
-    background-size: 70% !important; /* Προσαρμόστε το μέγεθος */
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-}
-
-/* Εξαφάνιση του παλιού εικονιδίου */
-.rw-launcher svg {
-    display: none !important;
-}
-```
-
-4.  Πατήστε **Δημοσίευση (Publish)**.
-    *(Τώρα το κουμπί θα έχει το λογότυπό σας!)*
+Δοκίμασέ το:
+1.  Μπες ως guest -> ζήτα διαγώνισμα (πρέπει να φας "πόρτα").
+2.  Κάνε Login -> ζήτα διαγώνισμα (πρέπει να δουλέψει).
 
