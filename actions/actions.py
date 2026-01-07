@@ -379,17 +379,37 @@ class ActionUploadExamMaterial(Action):
                          break
 
         if file_path:
+            # Clean up path (remove quotes)
+            file_path = file_path.strip().strip('"').strip("'")
+            
+            # 1. Direct Check
+            if os.path.exists(file_path):
+                print(f"DEBUG: Found file at exact path: {file_path}")
+            else:
+                # 2. Smart Check (Look in /app/files/ container mount)
+                filename = os.path.basename(file_path) # Extract "Math.docx" from "C:\...\Math.docx"
+                candidate_path = os.path.join("files", filename)
+                
+                if os.path.exists(candidate_path):
+                     print(f"DEBUG: Found file in 'files/' dir: {candidate_path}")
+                     file_path = candidate_path
+                else:
+                     # Check absolute /app/files just in case
+                     abs_candidate = os.path.join("/app/files", filename)
+                     if os.path.exists(abs_candidate):
+                         print(f"DEBUG: Found file in '/app/files': {abs_candidate}")
+                         file_path = abs_candidate
+                     else:
+                         print(f"DEBUG: File not found: {file_path} or {candidate_path}")
+                         # Don't fail yet, let logical check handle msg
+            
             # Deep Debug to File
             with open("debug_log.txt", "a", encoding="utf-8") as f:
                 f.write(f"\n--- New Upload Attempt ---\n")
-                f.write(f"RAW: {repr(file_path)}\n")
-            
-            file_path = file_path.strip().strip('"').strip("'")
-            
-            with open("debug_log.txt", "a", encoding="utf-8") as f:
-                f.write(f"SANITIZED: {repr(file_path)}\n")
-                f.write(f"IsDOCX: {file_path.lower().endswith('.docx')}\n")
+                f.write(f"Final Path: {file_path}\n")
                 f.write(f"Exists: {os.path.exists(file_path)}\n")
+        
+        # Default Slots
         
         # Default Slots
         subject = tracker.get_slot("subject")
