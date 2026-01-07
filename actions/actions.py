@@ -791,6 +791,23 @@ class ActionCreateExamNew(Action):
                     except Exception as img_e:
                         print(f"Failed to draw image: {img_e}")
                 
+                # --- INLINE ANSWER RENDERING (User Request) ---
+                if show_answers:
+                    # Ensure space exists
+                    if y_position < 60:
+                        c.showPage()
+                        y_position = height - 50
+                        
+                    # Draw Answer
+                    c.setFont("GreekFont-Bold", 10)
+                    c.setFillColor(colors.darkblue)
+                    answer_display = f"Απάντηση: {answer if answer else 'Δεν βρέθηκε'}"
+                    c.drawString(50, y_position, answer_display)
+                    c.setFillColor(colors.black)
+                    y_position -= 20
+                    print(f"DEBUG PDF: Drew inline answer '{answer_display}' for Q{i}")
+                # ---------------------------------------------
+
                 y_position -= 20
                 
                 # Page Break for next question if needed
@@ -798,27 +815,7 @@ class ActionCreateExamNew(Action):
                      c.showPage()
                      y_position = height - 50
 
-            # --- ANSWER KEY GENERATION ---
-            print(f"DEBUG PDF: Finished Questions. ShowAnswers={show_answers}. AnswersList={answers_text}")
-            
-            if show_answers:
-                # FORCE NEW PAGE for Answers
-                c.showPage()
-                y_position = height - 50
-                
-                c.setFont("GreekFont-Bold", 16)
-                c.drawString(50, y_position, "Απαντήσεις (Answer Key)")
-                y_position -= 40
-                c.setFont("GreekFont", 12)
-                
-                for line in answers_text:
-                    if y_position < 50:
-                        c.showPage()
-                        y_position = height - 50
-                    c.drawString(50, y_position, line)
-                    y_position -= 20
-            # -----------------------------
-            
+            # (No Answer Key Page anymore)
             c.save()
             abs_path = os.path.abspath(filepath)
             # Create Public URL
