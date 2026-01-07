@@ -659,12 +659,18 @@ class ActionCreateExamNew(Action):
                 answer = row['answer_text']
                 
                 # --- HEURISTIC: Fix embedded answers ---
-                # Check if question ends with a single letter like " A" or "\nB"
-                match = re.search(r'[\n\s]([ΑΒΓΔΕ])$', question_text)
+                # 1. First, strip ending whitespace/control chars
+                question_text = question_text.rstrip()
+                
+                # 2. Check for Answer pattern at the very end (e.g., "\n\n   B")
+                # Regex looks for: Newline/Space + Letter(A-E) + EndOfString
+                match = re.search(r'[\n\s]+([ΑΒΓΔΕ])$', question_text)
+                
                 if not answer and match:
                     answer = match.group(1)
-                    # Remove the answer letter from the question text to avoid artifacts
-                    question_text = question_text[:match.start()]
+                    # Remove the answer letter from the question text
+                    # We slice up to the start of the match to cut off the "\n B"
+                    question_text = question_text[:match.start()].rstrip()
                     print(f"DEBUG: Extracted answer '{answer}' from text for Q{i}")
                 # ---------------------------------------
 
