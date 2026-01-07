@@ -755,6 +755,11 @@ class ActionCreateExamNew(Action):
                          print(f"DEBUG: Extracted answer '{answer}' (was {raw_ans}) via Regex Q{i}")
                 # ---------------------------------------
 
+                # Save extracted answer back to row-like object for later use if needed? 
+                # Actually 'answer' var is what we use below.
+                # Store it in a list to use for the Answer Key page
+                answers_text.append(f"{i}. {answer if answer else '-'}")
+
                 # Add Question Label
                 header = f"Ερώτηση {i}:"
                 c.setFont("GreekFont-Bold", 12)
@@ -763,13 +768,8 @@ class ActionCreateExamNew(Action):
                 
                 # Draw Question Body
                 y_position = draw_multiline_text(c, question_text, 50, y_position, "GreekFont", 12, width - 100)
-                    
-                y_position -= 20
                 
-                if answer:
-                    answers_text.append(f"Απάντηση {i}: {answer}")
-                
-                # Image Rendering
+                # Image Handling
                 if row['image_path'] and os.path.exists(row['image_path']):
                     try:
                         img_path = row['image_path']
@@ -791,17 +791,34 @@ class ActionCreateExamNew(Action):
                     except Exception as img_e:
                         print(f"Failed to draw image: {img_e}")
                 
-                # Answer Text
-                if include_answers and str(include_answers).lower() == "true":
-                    ans_lines = sanitize_text(f"    Απάντηση: {row['answer_text']}").split('\n')
-                    c.setFillColor(colors.darkblue)
-                    for line in ans_lines:
-                        c.drawString(50, y_position, line)
-                        y_position -= 15
-                    c.setFillColor(colors.black)
-                
                 y_position -= 20
                 
+                # Page Break for next question if needed
+                if y_position < 50:
+                     c.showPage()
+                     y_position = height - 50
+
+            # --- ANSWER KEY GENERATION ---
+            print(f"DEBUG PDF: Finished Questions. ShowAnswers={show_answers}. AnswersList={answers_text}")
+            
+            if show_answers:
+                # FORCE NEW PAGE for Answers
+                c.showPage()
+                y_position = height - 50
+                
+                c.setFont("GreekFont-Bold", 16)
+                c.drawString(50, y_position, "Απαντήσεις (Answer Key)")
+                y_position -= 40
+                c.setFont("GreekFont", 12)
+                
+                for line in answers_text:
+                    if y_position < 50:
+                        c.showPage()
+                        y_position = height - 50
+                    c.drawString(50, y_position, line)
+                    y_position -= 20
+            # -----------------------------
+            
             c.save()
             abs_path = os.path.abspath(filepath)
             # Create Public URL
