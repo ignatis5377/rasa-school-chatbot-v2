@@ -658,20 +658,28 @@ class ActionCreateExamNew(Action):
                 question_text = row['question_text']
                 answer = row['answer_text']
                 
-                # --- HEURISTIC: Fix embedded answers ---
-                # 1. First, strip ending whitespace/control chars
-                question_text = question_text.rstrip()
+                # --- HEURISTIC V3: Last Line Strategy ---
+                # Split into lines to treat the "tail" separately
+                lines = question_text.strip().split('\n')
+                if len(lines) > 1:
+                    last_line = lines[-1].strip()
+                    # Remove all non-alphanumeric chars (like squares, \r, etc) from last line
+                    clean_last = re.sub(r'[^ΑΒΓΔΕ]', '', last_line)
+                    
+                    # If strictly one letter remains and original line was short (unlikely to be text)
+                    if len(clean_last) == 1 and len(last_line) < 5:
+                        answer = clean_last
+                        # Rebuild question without the last line
+                        question_text = '\n'.join(lines[:-1]).strip()
+                        print(f"DEBUG: Extracted answer '{answer}' via LastLine from Q{i}")
                 
-                # 2. Check for Answer pattern at the very end (e.g., "\n\n   B")
-                # Regex looks for: Newline/Space + Letter(A-E) + EndOfString
-                match = re.search(r'[\n\s]+([ΑΒΓΔΕ])$', question_text)
-                
-                if not answer and match:
-                    answer = match.group(1)
-                    # Remove the answer letter from the question text
-                    # We slice up to the start of the match to cut off the "\n B"
-                    question_text = question_text[:match.start()].rstrip()
-                    print(f"DEBUG: Extracted answer '{answer}' from text for Q{i}")
+                # Fallback Regex if single line
+                if not answer:
+                     match = re.search(r'[\n\s]+([ΑΒΓΔΕ])[\s\W]*$', question_text)
+                     if match:
+                         answer = match.group(1)
+                         question_text = question_text[:match.start()].strip()
+                         print(f"DEBUG: Extracted answer '{answer}' via Regex from Q{i}")
                 # ---------------------------------------
 
                 # Add Question Label
