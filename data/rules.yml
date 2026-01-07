@@ -43,11 +43,11 @@ rules:
     - requested_slot: null
   - action: action_create_exam_new
 
-- rule: Activate Upload Form
+- rule: Check Permissions for Upload
   steps:
   - intent: upload_exam_material
-  - action: upload_exam_form
-  - active_loop: upload_exam_form
+  - action: action_check_upload_permissions
+  # If allowed, this action triggers 'upload_exam_form' via FollowupAction
 
 - rule: Submit Upload Form
   condition:

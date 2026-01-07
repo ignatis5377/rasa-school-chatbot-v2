@@ -205,6 +205,7 @@ actions:
   - action_search_articles
   - action_smart_faq
   - action_upload_exam_material
+  - action_check_upload_permissions
 
 
 session_config:
