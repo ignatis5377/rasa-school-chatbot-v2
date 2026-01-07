@@ -1,58 +1,62 @@
-import sqlite3
+import sys
 import os
 
-# Adjust path for when running inside actions folder (DB is at ../data/questions.db relative to actions? 
-# No, in container PWD is /app, so DB is at data/questions.db. 
-# But this script will run from /app/actions/server_db_check.py or similar.
-# Let's use absolute path /app/data/questions.db which is standard in our docker-compose.
-DB_PATH = "/app/data/questions.db" 
+# Add /app/actions to path so we can import 'actions' module
+sys.path.append('/app/actions')
 
-def inspect():
-    # Use a local variable to avoid UnboundLocalError
-    target_db = DB_PATH
-    print(f"🔍 Checking DB at: {target_db}")
-    
-    if not os.path.exists(target_db):
-        print(f"❌ Database not found at {target_db}")
-        # Try relative just in case
-        if os.path.exists("data/questions.db"):
-             print("⚠️ Found at relative path 'data/questions.db' instead.")
-             target_db = "data/questions.db"
-        else:
-             return
-
-    conn = sqlite3.connect(target_db)
-    c = conn.cursor()
-    
-    print("\n--- 🔍 INSPECTING LAST 10 QUESTIONS ---")
+try:
+    from actions import extract_questions_from_docx
+except ImportError:
+    # If running from inside actions folder, try relative
     try:
-        # Check permissions
-        try:
-             c.execute("UPDATE questions SET id=id WHERE 1=0")
-             print("✅ DB is Writable")
-        except Exception as e:
-             print(f"❌ DB is READY-ONLY: {e}")
+        from actions import extract_questions_from_docx
+    except:
+        # Maybe we are IN the actions folder, so just import actions?
+        # No, actions.py is the file.
+        # Let's try direct import assuming we are running as script
+        # But actions.py has classes.
+        pass
 
-        c.execute("SELECT id, subject, question_text, answer_text FROM questions ORDER BY id DESC LIMIT 10")
-        rows = c.fetchall()
-        
-        if not rows:
-            print("⚠️ Database is empty!")
-        
-        for r in rows:
-            q_text = r[2] if r[2] else "EMPTY"
-            a_text = r[3] if r[3] else "EMPTY (NULL or '')"
-            
-            # Print first 50 chars
-            print(f"ID: {r[0]} | Sub: {r[1]}")
-            print(f"   Q: {q_text[:50].replace(chr(10), ' ')}...")
-            print(f"   A: '{a_text[:50].replace(chr(10), ' ')}...'")
-            print("-" * 20)
-            
-    except Exception as e:
-        print(f"Error reading DB: {e}")
-    finally:
-        conn.close()
+# Workaround to import 'extract_questions_from_docx' from 'actions.py'
+import importlib.util
+def load_module_from_path(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
-if __name__ == "__main__":
-    inspect()
+try:
+    actions_mod = load_module_from_path("actions", "/app/actions/actions.py")
+    extract_func = actions_mod.extract_questions_from_docx
+    print("✅ Successfully imported extract_questions_from_docx")
+except Exception as e:
+    print(f"❌ Failed to import actions.py: {e}")
+    sys.exit(1)
+
+FILE_PATH = "/app/files/Math_A_Easy_1.docx"
+
+if not os.path.exists(FILE_PATH):
+    print(f"❌ File not found at {FILE_PATH}")
+    # Try local
+    if os.path.exists("files/Math_A_Easy_1.docx"):
+         FILE_PATH = "files/Math_A_Easy_1.docx"
+    else:
+         sys.exit(1)
+
+print(f"📂 Parsing: {FILE_PATH}")
+try:
+    result = extract_func(FILE_PATH)
+    questions = result.get("questions", [])
+    print(f"📊 Found {len(questions)} questions.")
+    
+    for i, q in enumerate(questions, 1):
+        q_short = q['question'][:30].replace('\n', ' ')
+        a_short = q['answer'][:30].replace('\n', ' ') if q['answer'] else "EMPTY"
+        print(f"Q{i}: {q_short}...")
+        print(f"    ANS: '{a_short}'")
+        if not q['answer']:
+             print("    🚨 PROBLEM: Answer is empty!")
+
+except Exception as e:
+    print(f"❌ Error during parsing: {e}")
+
