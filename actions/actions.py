@@ -390,26 +390,32 @@ class ActionUploadExamMaterial(Action):
             # Clean up path (remove quotes)
             file_path = file_path.strip().strip('"').strip("'")
             
-            # 1. Direct Check
-            if os.path.exists(file_path):
-                print(f"DEBUG: Found file at exact path: {file_path}")
+            # Helper to check variations
+            def check_path_variations(path):
+                candidates = [
+                    path,
+                    path + ".docx",
+                    path.replace(".doc", ".docx"),
+                    os.path.join("files", os.path.basename(path)),
+                    os.path.join("files", os.path.basename(path) + ".docx"),
+                    os.path.join("files", os.path.basename(path).replace(".doc", ".docx")),
+                    os.path.join("/app/files", os.path.basename(path)),
+                    os.path.join("/app/files", os.path.basename(path) + ".docx"),
+                    os.path.join("/app/files", os.path.basename(path).replace(".doc", ".docx"))
+                ]
+                for c in candidates:
+                    if os.path.exists(c):
+                        return c
+                return None
+
+            found_path = check_path_variations(file_path)
+            
+            if found_path:
+                 print(f"DEBUG: Resolved '{file_path}' to '{found_path}'")
+                 file_path = found_path
             else:
-                # 2. Smart Check (Look in /app/files/ container mount)
-                filename = os.path.basename(file_path) # Extract "Math.docx" from "C:\...\Math.docx"
-                candidate_path = os.path.join("files", filename)
-                
-                if os.path.exists(candidate_path):
-                     print(f"DEBUG: Found file in 'files/' dir: {candidate_path}")
-                     file_path = candidate_path
-                else:
-                     # Check absolute /app/files just in case
-                     abs_candidate = os.path.join("/app/files", filename)
-                     if os.path.exists(abs_candidate):
-                         print(f"DEBUG: Found file in '/app/files': {abs_candidate}")
-                         file_path = abs_candidate
-                     else:
-                         print(f"DEBUG: File not found: {file_path} or {candidate_path}")
-                         # Don't fail yet, let logical check handle msg
+                 print(f"DEBUG: File not found after trying variations of: {file_path}")
+                 # Fallback logic continues, will error out later if strict check fails
             
             # Deep Debug to File
             with open("debug_log.txt", "a", encoding="utf-8") as f:
