@@ -658,31 +658,40 @@ class ActionCreateExamNew(Action):
                 question_text = row['question_text']
                 answer = row['answer_text']
                 
-                # --- HEURISTIC V3: Last Line Strategy ---
-                # Normalize line endings to avoid \r issues
+                # --- HEURISTIC V4: Polyglot Strategy (Latin + Greek) ---
+                # Normalize line endings
                 question_text = question_text.replace('\r', '\n')
                 
-                # Split into lines to treat the "tail" separately
+                # Split into lines
                 lines = question_text.strip().split('\n')
+                candidates = []
+                
                 if len(lines) > 1:
                     last_line = lines[-1].strip()
-                    # Remove all non-alphanumeric chars (like squares, \r, etc) from last line
-                    clean_last = re.sub(r'[^ΑΒΓΔΕ]', '', last_line)
+                    # Clean: Remove non-alphanumeric (keep Greek & Latin)
+                    # We check if it is A,B,C,D,E or Α,Β,Γ,Δ,Ε
+                    clean_last = re.sub(r'[^ΑΒΓΔΕA-E]', '', last_line)
                     
-                    # If strictly one letter remains and original line was short (unlikely to be text)
                     if len(clean_last) == 1 and len(last_line) < 5:
-                        answer = clean_last
-                        # Rebuild question without the last line
+                        raw_ans = clean_last
+                        # Map Latin to Greek just in case
+                        mapping = {'A':'Α', 'B':'Β', 'C':'Γ', 'D':'Δ', 'E':'Ε'}
+                        answer = mapping.get(raw_ans, raw_ans)
+                        
                         question_text = '\n'.join(lines[:-1]).strip()
-                        print(f"DEBUG: Extracted answer '{answer}' via LastLine from Q{i}")
-                
-                # Fallback Regex if single line
+                        print(f"DEBUG: Extracted answer '{answer}' (was {raw_ans}) via LastLine Q{i}")
+
+                # Fallback Regex (Global)
                 if not answer:
-                     match = re.search(r'[\n\s]+([ΑΒΓΔΕ])[\s\W]*$', question_text)
+                     # Check for A-E or Greek chars at end
+                     match = re.search(r'[\n\s]+([ΑΒΓΔΕA-E])[\s\W]*$', question_text)
                      if match:
-                         answer = match.group(1)
+                         raw_ans = match.group(1)
+                         mapping = {'A':'Α', 'B':'Β', 'C':'Γ', 'D':'Δ', 'E':'Ε'}
+                         answer = mapping.get(raw_ans, raw_ans)
+                         
                          question_text = question_text[:match.start()].strip()
-                         print(f"DEBUG: Extracted answer '{answer}' via Regex from Q{i}")
+                         print(f"DEBUG: Extracted answer '{answer}' (was {raw_ans}) via Regex Q{i}")
                 # ---------------------------------------
 
                 # Add Question Label
