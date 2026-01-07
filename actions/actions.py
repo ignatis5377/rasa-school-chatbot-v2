@@ -265,6 +265,7 @@ def extract_questions_from_docx(file_path: Text) -> Dict[Text, Any]:
     # Matches "ΕΡΩΤΗΣΗ 1", "Ερώτηση:", "Question 5", "Q:"
     q_start_pattern = re.compile(r'(?:^)(?:Q:|Ερώτηση|ΕΡΩΤΗΣΗ|Question|Πρόβλημα|Θέμα)\s*\d*[.:]?\s*(.*)', re.IGNORECASE)
     # Matches "ΑΠΑΝΤΗΣΗ", "Απάντηση:", "Answer", "A:", "ΛΥΣΗ"
+    # Added explicit check for single "ΑΠΑΝΤΗΣΗ" line which might be followed by answer on next line
     a_start_pattern = re.compile(r'(?:^)(?:A:|Απάντηση|ΑΠΑΝΤΗΣΗ|Answer|Λύση|ΛΥΣΗ)\s*\d*[.:]?\s*(.*)', re.IGNORECASE)
 
     with open("debug_log.txt", "a", encoding="utf-8") as f:
