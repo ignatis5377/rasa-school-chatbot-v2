@@ -318,7 +318,7 @@ def extract_questions_from_docx(file_path: Text) -> Dict[Text, Any]:
             # Init new
             current_q = {
                 "question": q_match.group(1), 
-                "answer": "", 
+                "answer": None,  # Changed from "" to None to track state
                 "image_path": image_path 
             }
         
@@ -327,15 +327,16 @@ def extract_questions_from_docx(file_path: Text) -> Dict[Text, Any]:
                f.write(f"MATCH A: {a_match.group(0)}\n")
 
             if current_q:
-                current_q["answer"] = a_match.group(1)
+                # Initialize answer (even if empty string) to signal we are in Answer mode
+                current_q["answer"] = a_match.group(1).strip()
         
         else:
             # Continuation
             if current_q:
                 content_to_add = text
                 if content_to_add or image_path:
-                    if not current_q["answer"]:
-                        # We are still in Question block
+                    if current_q["answer"] is None:
+                        # We are still in Question block (Answer not detected yet)
                         if content_to_add:
                              current_q["question"] += "\n" + content_to_add
                         if image_path and not current_q["image_path"]:
@@ -343,11 +344,18 @@ def extract_questions_from_docx(file_path: Text) -> Dict[Text, Any]:
                     else:
                         # We are in Answer block
                         if content_to_add:
-                            current_q["answer"] += "\n" + content_to_add
+                            # If answer was empty, just set it, else append
+                            if current_q["answer"]:
+                                current_q["answer"] += "\n" + content_to_add
+                            else:
+                                current_q["answer"] = content_to_add
                         # Optionally handle images in answers? For now, ignore or attach to Q.
     
     # Append last
     if current_q:
+        # Normalize None to empty string before saving
+        if current_q["answer"] is None:
+             current_q["answer"] = ""
         questions.append(current_q)
         
     return {"metadata": metadata, "questions": questions}
