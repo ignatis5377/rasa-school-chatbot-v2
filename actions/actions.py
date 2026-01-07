@@ -659,6 +659,9 @@ class ActionCreateExamNew(Action):
                 answer = row['answer_text']
                 
                 # --- HEURISTIC V3: Last Line Strategy ---
+                # Normalize line endings to avoid \r issues
+                question_text = question_text.replace('\r', '\n')
+                
                 # Split into lines to treat the "tail" separately
                 lines = question_text.strip().split('\n')
                 if len(lines) > 1:
