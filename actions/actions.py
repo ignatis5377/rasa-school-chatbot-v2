@@ -360,9 +360,35 @@ def extract_questions_from_docx(file_path: Text) -> Dict[Text, Any]:
         
     return {"metadata": metadata, "questions": questions}
 
+    return {"metadata": metadata, "questions": questions}
+
+class ActionCheckUploadPermissions(Action):
+    def name(self) -> Text:
+        return "action_check_upload_permissions"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # --- AUTH CHECK ---
+        # 1. User must be logged in
+        if not check_user_access(tracker):
+            dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες.")
+            return []
+
+        # 2. User must be Administrator
+        role = tracker.get_slot("role")
+        # Debug Log
+        print(f"DEBUG AUTH: Checking permissions for Upload. Role='{role}'")
+        
+        if not role or role.lower() != "administrator":
+             dispatcher.utter_message(text="📢 Για την προσθήκη νέου υλικού, παρακαλώ επικοινωνήστε με τον διαχειριστή του συστήματος στο email: admin@schoolbot.com")
+             return []
+        
+        # If Admin, Proceed to Form
+        return [FollowupAction("upload_exam_form")]
+
 class ActionUploadExamMaterial(Action):
     def name(self) -> Text:
         return "action_upload_exam_material"
+
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         # --- AUTH CHECK ---
