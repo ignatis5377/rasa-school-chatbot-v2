@@ -37,26 +37,4 @@ stories:
   - active_loop: null
   - action: action_create_exam_new
 
-- story: interactive_upload_exam
-  steps:
-  - intent: upload_exam_material
-  - action: upload_exam_form
-  - active_loop: upload_exam_form
-  - slot_was_set:
-    - requested_slot: upload_file_path
-  - slot_was_set:
-    - upload_file_path: "C:/test.pdf"
-  - slot_was_set:
-    - requested_slot: subject
-  - slot_was_set:
-    - subject: Φυσική
-  - slot_was_set:
-    - requested_slot: grade
-  - slot_was_set:
-    - grade: Α Γυμνασίου
-  - slot_was_set:
-    - requested_slot: difficulty
-  - slot_was_set:
-    - difficulty: Δύσκολο
-  - active_loop: null
-  - action: action_upload_exam_material
+
