@@ -84,6 +84,8 @@ try:
         # Determine Bold Path based on found Regular Path
         base_dir = os.path.dirname(font_path)
         bold_path = os.path.join(base_dir, "DejaVuSans-Bold.ttf")
+        italic_path = os.path.join(base_dir, "DejaVuSans-Oblique.ttf")
+        bold_italic_path = os.path.join(base_dir, "DejaVuSans-BoldOblique.ttf")
         
         if os.path.exists(bold_path):
              pdfmetrics.registerFont(TTFont('GreekFont-Bold', bold_path))
@@ -91,6 +93,20 @@ try:
         else:
              print("DEBUG: Bold font not found, falling back to regular for Bold.")
              pdfmetrics.registerFont(TTFont('GreekFont-Bold', font_path))
+
+        if os.path.exists(italic_path):
+             pdfmetrics.registerFont(TTFont('GreekFont-Italic', italic_path))
+             print(f"DEBUG: Loaded GreekFont-Italic from {italic_path}")
+        else:
+             # Fallback
+             pdfmetrics.registerFont(TTFont('GreekFont-Italic', font_path))
+
+        if os.path.exists(bold_italic_path):
+             pdfmetrics.registerFont(TTFont('GreekFont-BoldItalic', bold_italic_path))
+             print(f"DEBUG: Loaded GreekFont-BoldItalic from {bold_italic_path}")
+        else:
+             # Fallback
+             pdfmetrics.registerFont(TTFont('GreekFont-BoldItalic', font_path))
     else:
         # Fallback for Windows Local Dev ONLY
         print("DEBUG: DejaVuSans not found in standard paths.")
@@ -98,6 +114,8 @@ try:
              print("DEBUG: Loading Arial from Windows.")
              pdfmetrics.registerFont(TTFont('GreekFont', "C:/Windows/Fonts/arial.ttf"))
              pdfmetrics.registerFont(TTFont('GreekFont-Bold', "C:/Windows/Fonts/arial.ttf"))
+             pdfmetrics.registerFont(TTFont('GreekFont-Italic', "C:/Windows/Fonts/arial.ttf"))
+             pdfmetrics.registerFont(TTFont('GreekFont-BoldItalic', "C:/Windows/Fonts/arial.ttf"))
         else:
              print("ERROR: No suitable font found!")
 except Exception as e:
@@ -168,6 +186,26 @@ def extract_questions_from_pdf(file_path: Text) -> List[Dict]:
     # Regex definitions
     # Grade Headers: "Β’ ΓΥΜΝΑΣΙΟΥ" or "Β ΓΥΜΝΑΣΙΟΥ"
     grade_pattern = re.compile(r'(?:^|\n)([ΑΒΓ])\’?\s*ΓΥΜΝΑΣΙΟΥ', re.IGNORECASE)
+
+    def cleanup_text(text):
+        """
+        Normalizes text by converting Mathematical Alphanumeric Symbols 
+        (Bold, Italic, etc.) to standard Latin/Greek characters.
+        Fixes 'square' artifacts in PDFs.
+        """
+        if not text: return ""
+        
+        # Mapping for Mathematical Italic / Bold -> Standard
+        # We can use unicodedata.normalize('NFKC', text) which handles 
+        # many of these conversions automatically!
+        import unicodedata
+        normalized = unicodedata.normalize('NFKC', text)
+        
+        return normalized
+
+    text = cleanup_text(text)
+    
+    # Question/Answer Markers (as previously defined)
     
     # Question/Answer Markers (as previously defined)
     # We will iterate line by line or largely to handle state (Grade -> Question)
