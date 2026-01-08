@@ -11,5 +11,5 @@ openpyxl
 pillow
 python-docx
 websocket-client
-python-engineio==4.9.0
-python-socketio==5.11.1
+python-engineio==4.8.0
+python-socketio==5.10.0
