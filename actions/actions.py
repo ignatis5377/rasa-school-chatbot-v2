@@ -411,12 +411,20 @@ class ActionCheckUploadPermissions(Action):
             dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες.")
             return []
 
-        # 2. User must be Administrator
+        # 2. User must be Administrator OR Member
         role = tracker.get_slot("role")
+        
+        # Fallback: Get role from metadata if slot is empty
+        if not role:
+            metadata = tracker.latest_message.get("metadata", {})
+            user_data = metadata.get("customData", {}) or metadata
+            role = user_data.get("role")
+
         # Debug Log
         print(f"DEBUG AUTH: Checking permissions for Upload. Role='{role}'")
         
-        if not role or role.lower() != "administrator":
+        # Allow both Administrator and Member
+        if not role or role.lower() not in ["administrator", "member"]:
              dispatcher.utter_message(text="📢 Για την προσθήκη νέου υλικού, παρακαλώ επικοινωνήστε με τον διαχειριστή του συστήματος στο email: admin@schoolbot.com")
              return []
         
