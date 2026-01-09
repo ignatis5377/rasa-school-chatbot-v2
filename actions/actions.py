@@ -12,7 +12,7 @@ import sqlite3
 import re
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.events import SlotSet
+from rasa_sdk.events import SlotSet, FollowupAction
 
 print("\n\n**************************************************")
 print("LOADING ACTIONS.PY - VERSION CHECK: 12345")
