@@ -16,6 +16,9 @@ intents:
   - faq_remedial_teaching
   - create_exam
   - search_website
+  - inform_role_student
+  - inform_role_parent
+  - inform_role_teacher
 
   - subject
   - grade
@@ -140,7 +143,16 @@ forms:
     
 responses:
   utter_greet:
-  - text: "Γειά σας! Πώς μπορώ να βοηθήσω σήμερα;"
+  - text: "Γειά σας! Ειστε μαθητής, γονέας ή εκπαιδευτικός του σχολείου?"
+
+  utter_greet_student:
+  - text: "Μπορείς να αναζητησεις υλικό για διάβασμα για το μαθημα που θές ή οποια αλλη πληροφορία για την λειτουργία του σχολείου"
+
+  utter_greet_parent:
+  - text: "Μπορείτε να αναζητησετε θεματα που αφορουν την λειτουργια του σχολείου"
+
+  utter_greet_teacher:
+  - text: "Μπορειτε να αναρτησετε υλικό, να δημιουργησετε διαγωνισματα και να αναζητησετε πληροφοριες που αφορουν την λειτουργια του σχολειου"
   
   utter_goodbye:
   - text: "Αντίο! Ελπίζω να βοήθησα."

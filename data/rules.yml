@@ -114,3 +114,18 @@ rules:
   - intent: faq_remedial_teaching
   - action: action_smart_faq
 
+
+- rule: Respond to Student Role
+  steps:
+  - intent: inform_role_student
+  - action: utter_greet_student
+
+- rule: Respond to Parent Role
+  steps:
+  - intent: inform_role_parent
+  - action: utter_greet_parent
+
+- rule: Respond to Teacher Role
+  steps:
+  - intent: inform_role_teacher
+  - action: utter_greet_teacher
