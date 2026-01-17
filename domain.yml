@@ -212,6 +212,9 @@ responses:
   utter_faq_contact_person:
   - text: "Υπεύθυνος Γραμματείας είναι ο εκπαιδευτικός Λασκαρίδης Ιγνάτιος."
 
+  utter_default:
+  - text: "Συγνώμη αλλά δεν κατάλαβα. Θέλετε να με ρωτήσετε κάτι άλλο?"
+
 actions:
   - action_create_exam_new
   - action_search_articles
