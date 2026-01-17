@@ -221,6 +221,7 @@ actions:
   - action_smart_faq
   - action_upload_exam_material
   - action_check_upload_permissions
+  - action_handle_fallback
 
 
 session_config:
