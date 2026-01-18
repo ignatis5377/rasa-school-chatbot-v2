@@ -20,44 +20,58 @@
 
 ### Α. Ο "Εγκέφαλος" του Chatbot (Rasa)
 *   **`data/`:** Εδώ βρίσκονται τα δεδομένα εκπαίδευσης.
-    *   `nlu.yml`: Τι καταλαβαίνει το bot (Προθέσεις/Φράσεις).
-    *   `rules.yml` & `stories.yml`: Πώς πρέπει να απαντάει (Σενάρια διαλόγου).
+    *   `nlu.yml`: Τι καταλαβαίνει το bot (Προθέσεις/Φράσεις με νέα intents όπως `create_exam`, `search_website`).
+    *   `rules.yml` & `stories.yml`: Πώς πρέπει να απαντάει (π.χ. Fallback Stories, Role-based paths).
+    *   **`questions.db`:** Η βάση και οι ερωτήσεις. *Συχνά εξαιρείται από το Git.*
 *   **`domain.yml`:** Το "λεξικό" του bot. Εδώ ορίζονται όλες οι απαντήσεις (responses), οι υποδοχές μνήμης (slots) και οι φόρμες.
 *   **`config.yml`:** Οι τεχνικές ρυθμίσεις του μοντέλου AI (Pipeline, Policies).
 
-### Β. Η Λογική & Ο Κώδικας (Python)
-*   **`actions/`:** Εδώ βρίσκεται ο "προσαρμοσμένος κώδικας".
-    *   `actions.py`: **Το πιο σημαντικό αρχείο.** Περιέχει τον κώδικα για:
-        *   Την ανάγνωση των αρχείων Word (Parser).
-        *   Τη δημιουργία των PDF.
-        *   Την επικοινωνία με τη βάση δεδομένων.
-        *   Τον έλεγχο δικαιωμάτων (Admin check).
+### Β. Η Λογική & Ο Κώδικας (Python - `actions/`)
+*   **`actions.py`:** **Το πιο σημαντικό αρχείο.** Περιέχει:
+    *   `extract_questions_from_docx`: Parser για αρχεία Word.
+    *   `ActionCreateExamNew`: Γεννήτρια PDF με ReportLab.
+    *   `ActionSearchArticles`: Σύνδεση με WordPress API.
+    *   `ActionHandleFallback`: custom fallback logic.
+*   **`fonts/`:** Φάκελος που περιέχει την ελληνική γραμματοσειρά `DejaVuSans.ttf`.
 
 ### Γ. Υποδομή & Ρυθμίσεις Server
-*   **`docker-compose.yml`:** Το αρχείο-"αρχιτέκτονας". Ορίζει ποιες υπηρεσίες θα ξεκινήσουν (Rasa, Action Server, Nginx), σε ποιες θύρες (ports) και πώς συνδέονται μεταξύ τους.
-*   **`Dockerfile`:** Οδηγίες για το πώς "χτίζεται" το περιβάλλον του Action Server (εγκατάσταση Python βιβλιοθηκών).
-*   **`credentials.yml`:** **ΠΡΟΣΟΧΗ (Ευαίσθητο Αρχείο).** Εδώ βρίσκονται οι κωδικοί διασύνδεσης (π.χ. με το Facebook, το WordPress ή το REST API).
-*   **`endpoints.yml`:** Λέει στο Rasa πού να βρει τον Action Server.
+*   **`docker-compose.yml`:** Ορίζει τα services: `rasa`, `action-server`, `nginx`, `certbot`.
+*   **`Dockerfile`:** Χτίζει το image του Action Server, εγκαθιστώντας βιβλιοθήκες (`reportlab`, `python-docx`).
+*   **`credentials.yml`:** (SECRET) Κωδικοί διασύνδεσης.
+*   **`endpoints.yml`:** Συνδέει το Rasa με τον Action Server.
 
 ---
 
-## 3. Πού είναι τα Δεδομένα μου; (Βάση Δεδομένων)
+## 3. Διαχείριση Files & Volumes (Docker)
+Έχουμε ρυθμίσει ειδικούς "τόμους" (volumes) για να μην χάνονται δεδομένα όταν επανεκκινεί ο server:
 
-Μια συχνή απορία είναι: *"Πού είναι οι ερωτήσεις που ανέβασα;"*
-
-*   **Η Βάση (`questions.db`):** Βρίσκεται μέσα στον φάκελο `data/`.
-    *   *Σημείωση:* Αυτό το αρχείο αλλάζει δυναμικά όταν ανεβάζετε υλικό στον Server. Συχνά **ΔΕΝ** το κάνουμε upload στο GitHub για να μην σβήσουμε κατά λάθος τα δεδομένα του Server με τα τοπικά μας (κενά) δεδομένα.
-*   **Τα Αρχεία (`files/`):** Εδώ αποθηκεύονται τα Word (.docx) που ανεβάζετε. Επίσης είναι κοινόχρηστος φάκελος.
+1.  **`files/`**: Εδώ αποθηκεύονται τα Uploaded Docs και τα Generated PDFs.
+    *   Στο `docker-compose.yml`, γίνεται mount ως: `./files:/app/files`.
+2.  **`data/`**: Εδώ ζει η βάση δεδομένων `questions.db`.
+    *   Mounted ως: `./data:/app/data`.
+3.  **`fonts/`**: Οι γραμματοσειρές γίνονται mount για να τις βλέπει το ReportLab.
 
 ---
 
-## 4. Πώς βλέπω/αλλάζω ρυθμίσεις;
+## 4. Ροή Εργασίας (Workflow) για Αλλαγές
 
 Αν θέλετε να αλλάξετε κάτι (π.χ. το όνομα της βάσης ή ένα path):
 1.  Ανοίγετε το αρχείο `actions/actions.py` (για λογική) ή `docker-compose.yml` (για υποδομή).
-2.  Κάνετε την αλλαγή.
-3.  Τρέχετε: `git add .`, `git commit -m "Allagi"`, `git push`.
-4.  Στον Server: `git pull` και `sudo docker-compose restart`.
+2.  Κάνετε την αλλαγή και δοκιμάζετε τοπικά (αν είναι εφικτό).
+3.  Τρέχετε:
+    ```bash
+    git add .
+    git commit -m "Περιγραφή αλλαγής"
+    git push
+    ```
+4.  Στον Server (SSH):
+    ```bash
+    git pull
+    # Αν αλλάξατε Python κώδικα ή Dockerfile:
+    sudo docker-compose up -d --build --force-recreate
+    # Αν αλλάξατε μόνο Rasa data:
+    sudo docker-compose run rasa train
+    ```
 
 ---
 

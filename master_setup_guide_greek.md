@@ -6,124 +6,87 @@
 
 ## Φάση 1: Προετοιμασία & Τοπική Ανάπτυξη ("The Brain")
 
-Πριν βγούμε στο ίντερνετ, πρέπει να χτίσουμε το μυαλό του Chatbot στον υπολογιστή μας.
+Πριν βγούμε στο ίντερνετ, χτίσαμε το "μυαλό" του Chatbot τοπικά.
 
-### 1. Εργαλεία που χρειαστήκαμε
-*   **Python (3.10):** Η γλώσσα προγραμματισμού.
-*   **VS Code:** Ο επεξεργαστής κώδικα.
-*   **Git:** Για να κρατάμε ιστορικό αλλαγών.
+### 1. Stack
+*   **Python (3.10) & Rasa (3.x):** Ο πυρήνας.
+*   **VS Code:** IDE.
+*   **Git:** Version Control.
 
-### 2. Δημιουργία του Rasa Project
-1.  Εγκατάσταση βιβλιοθήκης: `pip install rasa`
-2.  Αρχικοποίηση: `rasa init` (Αυτό δημιούργησε τους φακέλους `data`, `actions`, `models`).
-3.  **Εκπαίδευση (Training):**
-    *   Στο `data/nlu.yml` γράψαμε τι θα ρωτάνε οι μαθητές (π.χ. "Θέλω διαγώνισμα").
-    *   Στο `domain.yml` ορίσαμε τις απαντήσεις.
-    *   Εκπαιδεύσαμε το μοντέλο: `rasa train`.
-
-### 3. Ανάπτυξη Λογικής (Python Actions)
-Εδώ γράψαμε τον κώδικα στο `actions/actions.py`:
-*   **Word Parser:** Χρησιμοποιήσαμε τη βιβλιοθήκη `python-docx` και Regular Expressions για να "διαβάζουμε" ερωτήσεις και απαντήσεις από αρχεία Word.
-*   **PDF Generator:** Χρησιμοποιήσαμε το `reportlab` για να σχεδιάζουμε δυναμικά τα διαγωνίσματα, βάζοντας το λογότυπο του σχολείου, τις εκφωνήσεις και τις εικόνες.
-*   **SQLite Database:** Φτιάξαμε μια βάση για να αποθηκεύουμε το υλικό (`questions.db`).
+### 2. Ανάπτυξη Λογικής (Actions)
+Στο `actions/actions.py`:
+*   **Word Parser:** Αναλύει `.docx` αρχεία (Ερωτήσεις/Απαντήσεις) και εξάγει εικόνες.
+*   **PDF Generator:** Χρησιμοποιεί το `reportlab` (με γραμματοσειρά **DejaVuSans**) για να φτιάχνει διαγωνίσματα με Inline Answers.
+*   **Search Integration:** Συνδέει το bot με το **WordPress REST API** για αναζήτηση άρθρων.
+*   **Fallback Logic:** Μετράει τις αποτυχημένες προσπάθειες και κάνει reset μετά από 3 λάθη.
 
 ---
 
 ## Φάση 2: Containerization ("The Box")
 
-Για να μην έχουμε το πρόβλημα *"Στον δικό μου υπολογιστή δουλεύει, στον Server όχι"*, κλείσαμε τα πάντα σε κουτιά (Docker Containers).
+Κλείσαμε τα πάντα σε Docker Containers για φορητότητα.
 
-### 1. Docker Desktop
-Το εγκαταστήσαμε στα Windows για να εξομοιώσουμε το περιβάλλον Linux.
+### 1. Τα Αρχεία Docker
+*   **`Dockerfile`:** Εγκαθιστά Python βιβλιοθήκες και εξασφαλίζει ότι το `DejaVuSans.ttf` είναι στη σωστή θέση (`/app/fonts/`) για να μην σπάνε τα PDF.
+*   **`docker-compose.yml`:** Σηκώνει 4 υπηρεσίες: Rasa, Action Server, Nginx, Certbot.
 
-### 2. Τα Αρχεία Docker
-*   **`Dockerfile`:** Μία "συνταγή" που λέει: *"Πάρε Python, βάλε τα ελληνικά Fonts (DejaVuSans), βάλε τις βιβλιοθήκες μου και φτιάξε τον Action Server"*.
-*   **`docker-compose.yml`:** Ο "μαέστρος". Λέει: *"Ξεκίνα το Rasa, μετά τον Action Server και τέλος τον Nginx. Σύνδεσέ τα μεταξύ τους"*.
+### 2. Volumes
+Ορίσαμε μόνιμους τόμους για να μην χάνονται τα αρχεία:
+*   `./data:/app/data` (Βάση Δεδομένων & Rasa Models)
+*   `./files:/app/files` (Uploaded Docs & Generated PDFs)
 
 ---
 
 ## Φάση 3: Το Σύννεφο (Google Cloud Platform)
 
-Ήρθε η ώρα να βγούμε Online.
-
-### 1. Δημιουργία Server (VM Instance)
-*   Πήγαμε στο **Compute Engine**.
-*   Φτιάξαμε ένα Instance (VM) με λειτουργικό **Ubuntu 20.04**.
-*   Επιλέξαμε τύπο **e2-medium** (4GB RAM) για να αντέχει το Rasa.
-
-### 2. Δικτύωση (Networking)
-*   **Static IP:** "Αγοράσαμε" μια σταθερή διεύθυνση IP (VPC Network -> External IP addresses) για να μας βρίσκει πάντα το σχολείο.
-*   **Firewall:** Ανοίξαμε τις πόρτες στο τείχος προστασίας:
-    *   `tcp:80` (HTTP - Για απλή περιήγηση)
-    *   `tcp:443` (HTTPS - Για ασφαλή περιήγηση)
-    *   `tcp:22` (SSH - Για να μπαίνουμε εμείς)
-
-### 3. Σύνδεση (SSH)
-Συνδεθήκαμε στον Server μέσω του μαύρου παραθύρου (Terminal) για να τον στήσουμε.
+### 1. Server Setup
+*   **VM Instance:** Ubuntu 20.04 (e2-medium, 4GB RAM).
+*   **Static IP:** Για σταθερή σύνδεση.
+*   **Firewall:** Ανοίξαμε ports 80 (HTTP), 443 (HTTPS), 22 (SSH).
 
 ---
 
 ## Φάση 4: Εγκατάσταση στον Server (Deployment)
 
-Αφού μπήκαμε στον Server:
-
-### 1. Εγκατάσταση Εργαλείων
+### 1. Εργαλεία
 ```bash
 sudo apt update
 sudo apt install docker.io docker-compose git
 ```
 
-### 2. Μεταφορά Κώδικα (Git)
-*   Ανεβάσαμε τον κώδικα από το PC μας στο GitHub (`git push`).
-*   Τον κατεβάσαμε στον Server: `git clone https://github.com/.../rasa-project.git`.
-
-### 3. Εκκίνηση (Launch)
-Μπήκαμε στον φάκελο και δώσαμε την εντολή:
+### 2. Permissions Fix (ΚΡΙΣΙΜΟ)
+Για να μπορεί ο Docker Container να γράφει στη βάση δεδομένων (`questions.db`) και να σώζει εικόνες, έπρεπε να δώσουμε δικαιώματα στον φάκελο:
 ```bash
-sudo docker-compose up -d --build
+sudo chmod -R 777 data files
 ```
-Το Docker κατέβασε τα πάντα, έχτισε τα containers και ξεκίνησε το Chatbot.
+*Χωρίς αυτό, παίρνουμε "Read-only database error".*
+
+### 3. Εκκίνηση
+```bash
+sudo docker-compose up -d --build --force-recreate
+```
 
 ---
 
-## Φάση 5: Ασφάλεια & Ιστός (The Web Layer)
+## Φάση 5: Ασφάλεια & Ιστός (Web Layer)
 
-Για να είναι επαγγελματικό και ασφαλές:
+### 1. Nginx & SSL
+*   Σερβίρουμε τα στατικά αρχεία (`/files/...`) μέσω Nginx.
+*   Χρησιμοποιούμε **Certbot** για δωρεάν SSL (HTTPS).
 
-### 1. Nginx (Reverse Proxy)
-Ρυθμίσαμε έναν Web Server (Nginx) να κάθεται μπροστά από το Rasa.
-*   Δέχεται τα αιτήματα από το ίντερνετ.
-*   Σερβίρει τα PDF αρχεία (`/files/...`).
-*   Προστατεύει τον Rasa Server.
-
-### 2. SSL/HTTPS (Certbot)
-Χρησιμοποιήσαμε το **Certbot** (Let's Encrypt) για να πάρουμε το "πράσινο λουκετάκι".
-*   Ρυθμίσαμε το Nginx να ανακατευθύνει όλα τα αιτήματα σε HTTPS (Port 443).
-*   Εξασφαλίσαμε ότι τα δεδομένα των μαθητών είναι κρυπτογραφημένα.
-
----
-
-## Φάση 6: Διασύνδεση με WordPress (The Frontend)
-
-Το τελικό βήμα: Να βάλουμε το Chatbot στο Site του σχολείου.
-
-### 1. Το Widget
-Πήραμε τον κώδικα Javascript του **Rasa Webchat** και τον βάλαμε στο `footer.php` του WordPress theme.
-
-### 2. Η Αυθεντικοποίηση (The Magic Trick)
-Γράψαμε κώδικα PHP που ελέγχει αν ο χρήστης είναι συνδεδεμένος στο WordPress.
-*   Αν ΝΑΙ -> Παίρνει το όνομα και τον ρόλο του.
-*   Τα στέλνει κρυφά στο Chatbot (`initPayload`).
-*   Το Chatbot (Action Server) διαβάζει αυτή την πληροφορία και αποφασίζει αν θα επιτρέψει το "Ανέβασμα Υλικού" (μόνο για Admin) ή το "Διαγώνισμα" (για όλους).
+### 2. WordPress Integration (Frontend)
+Προσθέσαμε το Webchat Widget στο `footer.php` του σχολικού site.
+*   **Payload Script:** Διαβάζει αν ο χρήστης είναι Admin/Member/Guest.
+*   **Role-Based Greeting:** Το Bot ξεκινάει τη συζήτηση προσαρμοσμένα ("Καλώς ήρθατε κ. Καθηγητά" vs "Γεια σου μαθητή").
 
 ---
 
 ## Συμπέρασμα
 
 Στήσαμε ένα πλήρες, μοντέρνο σύστημα DevOps:
-*   **Code:** Python/Rasa
-*   **Infrastructure:** Docker/GCP
-*   **Security:** Nginx/SSL/Firewall
-*   **Integration:** WordPress/PHP/JS
+*   **Code:** Python/Rasa με σύνθετη λογική (Search, PDF, Parsing).
+*   **Infrastructure:** Docker/GCP με σωστά Permissions και Volumes.
+*   **Security:** Nginx/SSL και Role-Based Access Control.
+*   **UX:** Fallback mechanisms και Smart Search.
 
 Το σύστημα είναι αυτόνομο, ασφαλές και έτοιμο για χρήση!
