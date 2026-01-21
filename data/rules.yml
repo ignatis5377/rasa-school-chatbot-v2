@@ -129,6 +129,24 @@ rules:
   steps:
   - action: utter_greet_teacher
 
+  - action: utter_greet_teacher
+
+- rule: Activate Study Material Form
+  steps:
+  - intent: ask_study_material
+  - action: study_material_form
+  - active_loop: study_material_form
+
+- rule: Submit Study Material Form
+  condition:
+  - active_loop: study_material_form
+  steps:
+  - action: study_material_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_provide_study_material
+
 - rule: Ask the user to rephrase whenever they send a message with low NLU confidence
   steps:
   - intent: nlu_fallback

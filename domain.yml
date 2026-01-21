@@ -20,6 +20,7 @@ intents:
   - inform_role_parent
   - inform_role_teacher
 
+  ask_study_material
   - subject
   - grade
   - difficulty
@@ -56,6 +57,8 @@ slots:
         requested_slot: subject
       - active_loop: upload_exam_form
         requested_slot: subject
+      - active_loop: study_material_form
+        requested_slot: subject
   
   grade:
     type: text
@@ -67,6 +70,8 @@ slots:
       - active_loop: exam_form
         requested_slot: grade
       - active_loop: upload_exam_form
+        requested_slot: grade
+      - active_loop: study_material_form
         requested_slot: grade
 
   include_answers:
@@ -140,6 +145,11 @@ forms:
         - subject
         - grade
         - difficulty
+
+  study_material_form:
+    required_slots:
+        - subject
+        - grade
     
 responses:
   utter_greet:
@@ -222,6 +232,7 @@ actions:
   - action_upload_exam_material
   - action_check_upload_permissions
   - action_handle_fallback
+  - action_provide_study_material
 
 
 session_config:
