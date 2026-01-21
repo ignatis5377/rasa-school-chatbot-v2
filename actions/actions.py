@@ -797,7 +797,7 @@ class ActionCreateExamNew(Action):
                          mapping = {'A':'Α', 'B':'Β', 'C':'Γ', 'D':'Δ', 'E':'Ε'}
                          answer = mapping.get(raw_ans, raw_ans)
                          
-                          question_text = question_text[:match.start()].strip()
+                         question_text = question_text[:match.start()].strip()
 
 
                          print(f"DEBUG: Extracted answer '{answer}' (was {raw_ans}) via Regex Q{i}")
