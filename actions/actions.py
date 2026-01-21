@@ -991,143 +991,88 @@ class ActionSmartFaq(Action):
         dispatcher.utter_message(text=final_message)
         return []
 
- 
- f r o m   r a s a _ s d k . e v e n t s   i m p o r t   U s e r U t t e r e d ,   R e s t a r t e d 
- 
- 
- 
- c l a s s   A c t i o n H a n d l e F a l l b a c k ( A c t i o n ) : 
- 
-         d e f   n a m e ( s e l f )   - >   T e x t : 
- 
-                 r e t u r n   " a c t i o n _ h a n d l e _ f a l l b a c k " 
- 
- 
- 
-         d e f   r u n ( s e l f ,   d i s p a t c h e r :   C o l l e c t i n g D i s p a t c h e r , 
- 
-                         t r a c k e r :   T r a c k e r , 
- 
-                         d o m a i n :   D i c t [ T e x t ,   A n y ] )   - >   L i s t [ D i c t [ T e x t ,   A n y ] ] : 
- 
-                 
- 
-                 #   C o u n t   c o n s e c u t i v e   f a l l b a c k s 
- 
-                 #   S t a r t   w i t h   1   ( t h e   c u r r e n t   o n e ) 
- 
-                 f a l l b a c k _ c o u n t   =   1 
- 
-                 
- 
-                 #   I t e r a t e   b a c k w a r d s   t h r o u g h   e v e n t s   i g n o r i n g   t h e   i m m e d i a t e   c u r r e n t   s t a t e 
- 
-                 #   W e   l o o k   f o r   U s e r U t t e r e d   e v e n t s . 
- 
-                 #   I f   t h e   i n t e n t   w a s   n l u _ f a l l b a c k ,   w e   i n c r e m e n t . 
- 
-                 #   I f   t h e   i n t e n t   w a s   s o m e t h i n g   e l s e   ( a n d   n o t   N o n e ) ,   w e   s t o p   c o u n t i n g . 
- 
-                 
- 
-                 #   N o t e :   T h e   * c u r r e n t *   u s e r   m e s s a g e   c a u s e d   t h i s   a c t i o n .   I t s   i n t e n t   i s   l i k e l y   n l u _ f a l l b a c k . 
- 
-                 #   W e   n e e d   t o   s e e   i f   t h e   * p r e v i o u s *   u s e r   m e s s a g e   w a s   a l s o   n l u _ f a l l b a c k . 
- 
-                 
- 
-                 p r i n t ( " D E B U G   F A L L B A C K :   C h e c k i n g   h i s t o r y   f o r   c o n s e c u t i v e   f a i l u r e s . . . " ) 
- 
-                 
- 
-                 #   W e   n e e d   t o   s k i p   t h e   * c u r r e n t *   t u r n ' s   u s e r   e v e n t   b e c a u s e   t h a t ' s   a l w a y s   n l u _ f a l l b a c k   ( w h i c h   t r i g g e r e d   t h i s ) . 
- 
-                 #   A c t u a l l y ,   l e t ' s   j u s t   c o u n t   A L L   c o n s e c u t i v e   n l u _ f a l l b a c k s   f r o m   t h e   e n d . 
- 
-                 
- 
-                 f o r   e v e n t   i n   r e v e r s e d ( t r a c k e r . e v e n t s ) : 
- 
-                         i f   e v e n t . g e t ( " e v e n t " )   = =   " u s e r " : 
- 
-                                 p a r s e _ d a t a   =   e v e n t . g e t ( " p a r s e _ d a t a " ,   { } ) 
- 
-                                 i n t e n t _ n a m e   =   p a r s e _ d a t a . g e t ( " i n t e n t " ,   { } ) . g e t ( " n a m e " ) 
- 
-                                 
- 
-                                 #   I f   w e   j u s t   s t a r t e d   i t e r a t i o n ,   t h i s   i s   t h e   c u r r e n t   m e s s a g e . 
- 
-                                 #   I t   * s h o u l d *   b e   n l u _ f a l l b a c k . 
- 
-                                 
- 
-                                 i f   i n t e n t _ n a m e   = =   " n l u _ f a l l b a c k " : 
- 
-                                         #   D e t e r m i n e   i f   w e   s h o u l d   i n c r e m e n t   b e y o n d   t h e   f i r s t   o n e 
- 
-                                         #   W e   c a n   s t o r e   m a t c h e s   i n   a   l i s t   o r   j u s t   c o u n t 
- 
-                                         p a s s   #   l o g i c   b e l o w 
- 
-                                 e l s e : 
- 
-                                         #   F o u n d   a   v a l i d   i n t e n t !   S t o p   c o u n t i n g . 
- 
-                                         b r e a k 
- 
-                 
- 
-                 #   L e t ' s   t r y   a   s i m p l e r   a p p r o a c h   s i n c e   " p a r s e _ d a t a "   a v a i l a b i l i t y   m i g h t   v a r y   d e p e n d i n g   o n   c o n f i g u r a t i o n . 
- 
-                 #   W e   c a n   a l s o   c h e c k   t h e   " m e t a d a t a "   i f   w e   t a g   i t ?   N o . 
- 
-                 
- 
-                 #   A l t e r n a t i v e :   W e   c a n   t r u s t   t h e   t r a c k e r . l a t e s t _ m e s s a g e   w h i c h   i s   t h e   C U R R E N T   o n e . 
- 
-                 #   T h e n   w e   l o o k   a t   t h e   o n e   b e f o r e   t h a t . 
- 
-                 
- 
-                 c o u n t   =   0 
- 
-                 f o u n d _ v a l i d   =   F a l s e 
- 
-                 
- 
-                 f o r   e v e n t   i n   r e v e r s e d ( t r a c k e r . e v e n t s ) : 
- 
-                         i f   e v e n t . g e t ( " e v e n t " )   = =   " u s e r " : 
- 
-                                 i n t e n t   =   e v e n t . g e t ( " p a r s e _ d a t a " ,   { } ) . g e t ( " i n t e n t " ,   { } ) . g e t ( " n a m e " ) 
- 
-                                 i f   i n t e n t   = =   " n l u _ f a l l b a c k " : 
- 
-                                         c o u n t   + =   1 
- 
-                                 e l s e : 
- 
-                                         f o u n d _ v a l i d   =   T r u e 
- 
-                                         b r e a k 
- 
-                 
- 
-                 p r i n t ( f " D E B U G   F A L L B A C K :   C o n s e c u t i v e   C o u n t   =   { c o u n t } " ) 
- 
-                 
- 
-                 i f   c o u n t   <   3 : 
- 
-                         d i s p a t c h e r . u t t e r _ m e s s a g e ( r e s p o n s e = " u t t e r _ p l e a s e _ r e p e a t " ) 
- 
-                         r e t u r n   [ ] 
- 
-                 e l s e : 
- 
-                         d i s p a t c h e r . u t t e r _ m e s s a g e ( r e s p o n s e = " u t t e r _ d e f a u l t " ) 
- 
-                         r e t u r n   [ R e s t a r t e d ( ) ] 
- 
- 
+
+class ActionProvideStudyMaterial(Action):
+    def name(self) -> Text:
+        return "action_provide_study_material"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        subject = tracker.get_slot("subject")
+        grade = tracker.get_slot("grade")
+
+        links = {
+            "A": [
+                "https://3gym-thivas.voi.sch.gr/images/documents_pdf/mathematics/a1-5II-fylloI.pdf",
+                "https://www.taexeiola.gr/%CE%BB%CF%85%CE%BC%CE%B5%CE%BD%CE%B1-%CE%B8%CE%B5%CE%BC%CE%B1%CF%84%CE%B1-%CF%80%CF%81%CE%BF%CE%B1%CE%B3%CF%89%CE%B3%CE%B9%CE%BA%CF%89%CE%BD-%CE%B5%CE%BE%CE%B5%CF%84%CE%B1%CF%83%CE%B5%CF%89%CE%BD/"
+            ],
+            "B": [
+                "https://www.taexeiola.gr/%CF%83%CF%87%CE%BF%CE%BB%CE%B9%CE%BA%CE%BF-%CE%B2%CE%BF%CE%B7%CE%B8%CE%B7%CE%BC%CE%B1-%CE%BC%CE%B1%CE%B8%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CF%89%CE%BD-%CE%B2-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1/",
+                "https://www.taexeiola.gr/%CE%B5%CF%81%CF%89%CF%84%CE%B7%CF%83%CE%B5%CE%B9%CF%82-%CE%B8%CE%B5%CF%89%CF%81%CE%B9%CE%B1-%CE%BC%CE%B1%CE%B8%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CF%89%CE%BD-%CE%B2-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1/"
+            ],
+            "C": [
+                "https://www.taexeiola.gr/%ce%bc%ce%b1%ce%b8%ce%b7%ce%bc%ce%b1%cf%84%ce%b9%ce%ba%ce%b1-%ce%b3-%ce%b3%cf%85%ce%bc%ce%bd-%ce%b8%ce%b5%cf%89%cf%81%ce%b9%ce%b1-%ce%b1%cf%83%ce%ba%ce%b7%cf%83%ce%b5%ce%b9%cf%82/",
+                "https://www.taexeiola.gr/%CF%83%CF%87%CE%BF%CE%BB%CE%B9%CE%BA%CE%BF-%CE%B2%CE%BF%CE%B7%CE%B8%CE%B7%CE%BC%CE%B1-%CE%BC%CE%B1%CE%B8%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CF%89%CE%BD-%CE%B3-%CE%B3%CF%85%CE%BC%CE%BD/"
+            ]
+        }
+
+        def clean_text(t):
+            if not t: return ""
+            rep = {'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω','ϊ':'ι','ϋ':'υ','ς':'σ'}
+            s = t.lower()
+            for k,v in rep.items(): s = s.replace(k,v)
+            return s
+
+        normalized_subject = clean_text(subject)
+        # Check if subject is math-related
+        if not any(x in normalized_subject for x in ["μαθηματικα", "mathematics", "math"]):
+             dispatcher.utter_message(text="Δεν υπάρχει υλικό ακόμα για αυτό το μάθημα.")
+             return [SlotSet("subject", None), SlotSet("grade", None), FollowupAction("action_restart")]
+
+        selected_grade_key = None
+        norm_grade = clean_text(grade)
+        
+        if "α" in norm_grade and "γυμνασιου" in norm_grade: selected_grade_key = "A"
+        elif "β" in norm_grade and "γυμνασιου" in norm_grade: selected_grade_key = "B"
+        elif "γ" in norm_grade and "γυμνασιου" in norm_grade: selected_grade_key = "C"
+        elif "a" in norm_grade: selected_grade_key = "A"
+        elif "b" in norm_grade: selected_grade_key = "B"
+        elif "c" in norm_grade: selected_grade_key = "C"
+        
+        if not selected_grade_key:
+             # Heuristic for single letters
+             if "α" == norm_grade: selected_grade_key = "A"
+             elif "β" == norm_grade: selected_grade_key = "B"
+             elif "γ" == norm_grade: selected_grade_key = "C"
+
+        if selected_grade_key and selected_grade_key in links:
+             link = random.choice(links[selected_grade_key])
+             dispatcher.utter_message(text=f"Ορίστε ένα χρήσιμο link για τα Μαθηματικά της {selected_grade_key} τάξης:\n{link}")
+        else:
+             dispatcher.utter_message(text="Δεν βρέθηκε υλικό για τη συγκεκριμένη τάξη.")
+        
+        return [SlotSet("subject", None), SlotSet("grade", None)]
+
+from rasa_sdk.events import UserUttered, Restarted
+
+class ActionHandleFallback(Action):
+    def name(self) -> Text:
+        return "action_handle_fallback"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        count = 0 
+        for event in reversed(tracker.events):
+             if event.get("event") == "user":
+                 intent = event.get("parse_data", {}).get("intent", {}).get("name")
+                 if intent == "nlu_fallback":
+                     count += 1
+                 else:
+                     break
+        
+        print(f"DEBUG FALLBACK: Consecutive Count = {count}")
+
+        if count < 3:
+             dispatcher.utter_message(text="Συγνώμη, δεν κατάλαβα. Μπορείτε να το διατυπώσετε διαφορετικά;")
+             return []
+        else:
+             dispatcher.utter_message(response="utter_default")
+             return [Restarted()]
