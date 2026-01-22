@@ -20,14 +20,10 @@ intents:
   - inform_role_parent
   - inform_role_teacher
 
-  ask_study_material
-  - subject
-  - grade
-  - difficulty
-  - num_questions
-  - query
+  - ask_study_material
   - upload_exam_material
   - inform_file_path
+  - inform
 
 entities:
   - subject
