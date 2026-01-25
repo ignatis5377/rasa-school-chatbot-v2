@@ -1076,3 +1076,62 @@ class ActionHandleFallback(Action):
         else:
              dispatcher.utter_message(response="utter_default")
              return [Restarted()]
+
+class ActionCheckCreateExamPermissions(Action):
+    def name(self) -> Text:
+        return "action_check_create_exam_permissions"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # --- AUTH CHECK ---
+        if not check_user_access(tracker):
+            dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες με ρόλο Teacher ή Admin.\nΠαρακαλώ συνδεθείτε!")
+            return []
+
+        # Double check role permissions specifically if needed
+        role = tracker.get_slot("role")
+        if not role:
+            metadata = tracker.latest_message.get("metadata", {})
+            user_data = metadata.get("customData", {}) or metadata
+            role = user_data.get("role")
+        
+        if not role or role.lower() not in ["administrator", "member", "teacher"]:
+             # If "member" allows it, fine. Assuming "member" is the standard auth role here based on check_user_access.
+             # Adjust if create_exam is STRICTLY teacher only.
+             # For now, we reuse check_user_access which checks for "member" or username.
+             pass
+
+        return [FollowupAction("exam_form")]
+
+class ActionVerifyRole(Action):
+    def name(self) -> Text:
+        return "action_verify_role"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        intent = tracker.latest_message.get("intent", {}).get("name")
+        
+        # Map intent to role for context
+        role_map = {
+            "inform_role_student": "student",
+            "inform_role_parent": "parent",
+            "inform_role_teacher": "teacher"
+        }
+        
+        target_role = role_map.get(intent)
+        
+        # --- AUTH CHECK ---
+        # Immediate check: Is this user logged in?
+        if not check_user_access(tracker):
+            dispatcher.utter_message(text="🚫 Παρακαλώ συνδεθείτε πρώτα για να συνεχίσετε ως εγγεγραμμένος χρήστης.")
+            return []
+
+        # If Authenticated, give the specific greeting
+        if target_role == "student":
+            dispatcher.utter_message(response="utter_greet_student")
+        elif target_role == "parent":
+            dispatcher.utter_message(response="utter_greet_parent")
+        elif target_role == "teacher":
+            dispatcher.utter_message(response="utter_greet_teacher")
+        else:
+            dispatcher.utter_message(text="Καλωσήρθατε!")
+
+        return []

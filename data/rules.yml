@@ -30,8 +30,8 @@ rules:
 - rule: Activate Exam Form
   steps:
   - intent: create_exam
-  - action: exam_form
-  - active_loop: exam_form
+  - action: action_check_create_exam_permissions
+  # - action: exam_form # Removed: Form is triggered by FollowupAction if allowed
 
 - rule: Submit Exam Form
   condition:
@@ -118,17 +118,17 @@ rules:
 - rule: Respond to Student Role
   steps:
   - intent: inform_role_student
-  - action: utter_greet_student
+  - action: action_verify_role
 
 - rule: Respond to Parent Role
   steps:
   - intent: inform_role_parent
-  - action: utter_greet_parent
+  - action: action_verify_role
 
 - rule: Respond to Teacher Role
   steps:
   - intent: inform_role_teacher
-  - action: utter_greet_teacher
+  - action: action_verify_role
 
 - rule: Activate Study Material Form
   steps:

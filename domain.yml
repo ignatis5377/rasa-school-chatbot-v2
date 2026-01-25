@@ -229,6 +229,8 @@ actions:
   - action_check_upload_permissions
   - action_handle_fallback
   - action_provide_study_material
+  - action_check_create_exam_permissions
+  - action_verify_role
 
 
 session_config:
