@@ -127,8 +127,7 @@ rules:
 
 - rule: Respond to Teacher Role
   steps:
-  - action: utter_greet_teacher
-
+  - intent: inform_role_teacher
   - action: utter_greet_teacher
 
 - rule: Activate Study Material Form
