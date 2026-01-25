@@ -27,8 +27,7 @@ intents:
 
   - ask_study_material
   - upload_exam_material
-  - inform_file_path
-  - inform
+
 
 entities:
   - subject
