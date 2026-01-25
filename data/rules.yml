@@ -39,6 +39,12 @@ rules:
     - requested_slot: null
   - action: action_create_exam_new
 
+- rule: Check Permissions for Create Exam
+  steps:
+  - intent: create_exam
+  - action: action_check_create_exam_permissions
+  # If allowed, this action triggers 'exam_form' via FollowupAction
+
 - rule: Check Permissions for Upload
   steps:
   - intent: upload_exam_material
