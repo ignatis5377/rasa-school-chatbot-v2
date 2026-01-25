@@ -12,7 +12,9 @@ stories:
 - story: interactive_create_exam
   steps:
   - intent: create_exam
+  - action: action_check_create_exam_permissions
   - action: exam_form
+
   - active_loop: exam_form
   - slot_was_set:
     - requested_slot: subject
