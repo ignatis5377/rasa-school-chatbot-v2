@@ -27,11 +27,7 @@ rules:
   - intent: ask_school_calendar
   - action: utter_school_calendar
 
-- rule: Activate Exam Form
-  steps:
-  - intent: create_exam
-  - action: action_check_create_exam_permissions
-  # - action: exam_form # Removed: Form is triggered by FollowupAction if allowed
+
 
 - rule: Submit Exam Form
   condition:

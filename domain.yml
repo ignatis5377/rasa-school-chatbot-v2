@@ -5,6 +5,11 @@ intents:
   - goodbye
   - bot_challenge
   - faq_contact_hours
+  - ask_contact_info
+  - ask_absences_info
+  - ask_school_calendar
+  - inform
+  - inform_file_path
   - faq_contact_details
   - faq_contact_person
   - faq_parent_briefing
