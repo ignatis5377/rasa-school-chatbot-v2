@@ -1118,11 +1118,9 @@ class ActionVerifyRole(Action):
         
         target_role = role_map.get(intent)
         
-        # --- AUTH CHECK ---
-        # Immediate check: Is this user logged in?
-        if not check_user_access(tracker):
-            dispatcher.utter_message(text="🚫 Παρακαλώ συνδεθείτε πρώτα για να συνεχίσετε ως εγγεγραμμένος χρήστης.")
-            return []
+        # No Auth Check here - Role selection is public.
+        # We only set the slot for context if needed, but primarily we just respond.
+
 
         # If Authenticated, give the specific greeting
         if target_role == "student":
