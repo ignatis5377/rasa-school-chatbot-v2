@@ -1037,25 +1037,72 @@ class ActionProvideStudyMaterial(Action):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         
-        # Use LIKE for subject to be flexible (e.g. 'Math' vs 'Mathematics') or strict?
-        # Using strict for now based on upload logic, or partial match.
-        # Let's try partial match for subject.
+        # Use LIKE for subject to be flexible
         c.execute("SELECT title, url FROM study_materials WHERE subject LIKE ? AND grade = ?", (f"%{subj_clean}%", grade_key))
         rows = c.fetchall()
         
         conn.close()
 
         if rows:
-             message = f"Βρήκα το εξής υλικό για {subject} {grade}:\n\n"
+             # User requested: "gives only one result which will be the Title with hyperlink"
+             # If multiple exist, we list them all formatted as links.
+             message = ""
              for row in rows:
                  title, url = row
-                 message += f"- [{title}]({url})\n"
+                 message += f"[{title}]({url})\n"
              dispatcher.utter_message(text=message)
         else:
-             # Fallback or empty message
-             dispatcher.utter_message(text=f"Δεν βρέθηκε υλικό για {subject} {grade} στη βάση μας.")
+             dispatcher.utter_message(text=f"Δεν βρέθηκε υλικό για {subject} {grade}.")
         
         return [SlotSet("subject", None), SlotSet("grade", None)]
+
+
+class ActionUploadStudyMaterial(Action):
+    def name(self) -> Text:
+        return "action_upload_study_material"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        link = tracker.get_slot("upload_link")
+        subject = tracker.get_slot("subject")
+        grade = tracker.get_slot("grade")
+        
+        if not link or not subject or not grade:
+            dispatcher.utter_message(text="❌ Λείπουν πληροφορίες (Σύνδεσμος, Μάθημα ή Τάξη).")
+            return []
+
+        # Helper to match DB format (Same as Provide)
+        def clean_text(t):
+            if not t: return ""
+            rep = {'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω','ϊ':'ι','ϋ':'υ','ς':'σ'}
+            s = t.lower()
+            for k,v in rep.items(): s = s.replace(k,v)
+            return s.capitalize()
+
+        subj_clean = clean_text(subject)
+        norm_grade = clean_text(grade).upper()
+        grade_key = "A" if "Α" in norm_grade or "A" in norm_grade else "B" if "Β" in norm_grade or "B" in norm_grade else "C" if "Γ" in norm_grade or "C" in norm_grade else norm_grade
+        
+        # Generate Title like: Mathematics_A_1
+        # Need current count to increment
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Count existing for this subject/grade
+        c.execute("SELECT COUNT(*) FROM study_materials WHERE subject = ? AND grade = ?", (subj_clean, grade_key))
+        count = c.fetchone()[0]
+        new_id = count + 1
+        
+        generated_title = f"{subj_clean}_{grade_key}_{new_id}"
+        
+        # Insert Link
+        c.execute("INSERT INTO study_materials (subject, grade, title, url) VALUES (?, ?, ?, ?)", 
+                  (subj_clean, grade_key, generated_title, link))
+        
+        conn.commit()
+        conn.close()
+        
+        dispatcher.utter_message(text=f"✅ Το υλικό ανέβηκε επιτυχώς!\nΤίτλος: {generated_title}")
+        return [SlotSet("upload_link", None), SlotSet("subject", None), SlotSet("grade", None)]
 
 from rasa_sdk.events import UserUttered, Restarted
 

@@ -131,34 +131,42 @@ slots:
     - type: from_entity
       entity: username
 
+  upload_link:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: upload_study_material_form
+        requested_slot: upload_link
+
 forms:
   exam_form:
     required_slots:
-        - subject
-        - grade
+        - exam_subject
+        - exam_grade
         - difficulty
-        - num_questions
-        - include_answers
+        - number_of_questions
 
   upload_exam_form:
     required_slots:
         - upload_file_path
-        - subject
-        - grade
-        - difficulty
+        - exam_subject
+        - exam_grade
 
   upload_study_material_form:
     required_slots:
-        - upload_file_path
+        - upload_link
         - subject
         - grade
-
+  
   study_material_form:
     required_slots:
         - subject
         - grade
     
 responses:
+  utter_ask_upload_link:
+  - text: "Παρακαλώ δώστε μου τον σύνδεσμο (URL) του υλικού."
   utter_greet:
   - text: "Γειά σας! Ειστε μαθητής, γονέας ή εκπαιδευτικός του σχολείου?"
 
