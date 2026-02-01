@@ -78,10 +78,9 @@ slots:
     - type: from_intent
       intent: deny
       value: false
-    - type: from_text
-      conditions:
-      - active_loop: exam_form
-        requested_slot: include_answers
+    - type: from_intent
+      intent: deny
+      value: false
 
   upload_file_path:
     type: text
