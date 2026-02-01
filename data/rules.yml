@@ -146,7 +146,7 @@ rules:
   - active_loop: null
   - slot_was_set:
     - requested_slot: null
-  - action: action_upload_study_material
+  - action: action_upload_study_material_final
 
 - rule: Activate Study Material Form
   steps:

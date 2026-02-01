@@ -274,7 +274,7 @@ actions:
   - action_provide_study_material
   - action_check_create_exam_permissions
   - action_verify_role
-  - action_upload_study_material
+  - action_upload_study_material_final
   - action_check_study_material_upload_permissions
 
 
