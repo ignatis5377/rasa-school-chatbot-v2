@@ -1113,6 +1113,7 @@ class ActionVerifyRole(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         intent = tracker.latest_message.get("intent", {}).get("name")
+        print(f"DEBUG VERIFY ROLE: Received intent '{intent}'")
         
         # Map intent to role for context
         role_map = {

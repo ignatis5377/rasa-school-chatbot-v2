@@ -101,8 +101,7 @@ slots:
         requested_slot: upload_file_path
       - active_loop: upload_study_material_form
         requested_slot: upload_file_path
-      - active_loop: upload_study_material_form
-        requested_slot: upload_file_path
+
 
   difficulty:
     type: text
