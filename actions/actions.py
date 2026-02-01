@@ -1113,6 +1113,7 @@ class ActionVerifyRole(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         intent = tracker.latest_message.get("intent", {}).get("name")
+        print(f"DEBUG ACTION: received intent '{intent}'")
         
         # Map intent to role for context
         role_map = {
@@ -1122,6 +1123,7 @@ class ActionVerifyRole(Action):
         }
         
         target_role = role_map.get(intent)
+        print(f"DEBUG ACTION: target_role determined as '{target_role}'")
         
         # No Auth Check here - Role selection is public.
         # We only set the slot for context if needed, but primarily we just respond.
@@ -1129,13 +1131,17 @@ class ActionVerifyRole(Action):
 
         # If Authenticated, give the specific greeting
         if target_role == "student":
+            print("DEBUG ACTION: Greeting student")
             dispatcher.utter_message(response="utter_greet_student")
         elif target_role == "parent":
-            dispatcher.utter_message(response="utter_greet_parent")
+             print("DEBUG ACTION: Greeting parent")
+             dispatcher.utter_message(response="utter_greet_parent")
         elif target_role == "teacher":
-            dispatcher.utter_message(response="utter_greet_teacher")
+             print("DEBUG ACTION: Greeting teacher")
+             dispatcher.utter_message(response="utter_greet_teacher")
         else:
-            dispatcher.utter_message(text="Καλωσήρθατε!")
+             print("DEBUG ACTION: Fallback greeting")
+             dispatcher.utter_message(text="Καλωσήρθατε!")
 
         return []
 
