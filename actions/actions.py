@@ -48,6 +48,15 @@ def init_db():
                   answer_text TEXT,
                   source_file TEXT,
                   image_path TEXT)''')
+
+    c.execute('''CREATE TABLE IF NOT EXISTS study_materials
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  subject TEXT,
+                  grade TEXT,
+                  filename TEXT,
+                  title TEXT,
+                  url TEXT,
+                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
     # Migration for existing DB: Attempt to add the column if it's missing
     try:
@@ -1000,55 +1009,51 @@ class ActionProvideStudyMaterial(Action):
         subject = tracker.get_slot("subject")
         grade = tracker.get_slot("grade")
 
-        links = {
-            "A": [
-                "https://3gym-thivas.voi.sch.gr/images/documents_pdf/mathematics/a1-5II-fylloI.pdf",
-                "https://www.taexeiola.gr/%CE%BB%CF%85%CE%BC%CE%B5%CE%BD%CE%B1-%CE%B8%CE%B5%CE%BC%CE%B1%CF%84%CE%B1-%CF%80%CF%81%CE%BF%CE%B1%CE%B3%CF%89%CE%B3%CE%B9%CE%BA%CF%89%CE%BD-%CE%B5%CE%BE%CE%B5%CF%84%CE%B1%CF%83%CE%B5%CF%89%CE%BD/"
-            ],
-            "B": [
-                "https://www.taexeiola.gr/%CF%83%CF%87%CE%BF%CE%BB%CE%B9%CE%BA%CE%BF-%CE%B2%CE%BF%CE%B7%CE%B8%CE%B7%CE%BC%CE%B1-%CE%BC%CE%B1%CE%B8%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CF%89%CE%BD-%CE%B2-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1/",
-                "https://www.taexeiola.gr/%CE%B5%CF%81%CF%89%CF%84%CE%B7%CF%83%CE%B5%CE%B9%CF%82-%CE%B8%CE%B5%CF%89%CF%81%CE%B9%CE%B1-%CE%BC%CE%B1%CE%B8%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CF%89%CE%BD-%CE%B2-%CE%B3%CF%85%CE%BC%CE%BD%CE%B1/"
-            ],
-            "C": [
-                "https://www.taexeiola.gr/%ce%bc%ce%b1%ce%b8%ce%b7%ce%bc%ce%b1%cf%84%ce%b9%ce%ba%ce%b1-%ce%b3-%ce%b3%cf%85%ce%bc%ce%bd-%ce%b8%ce%b5%cf%89%cf%81%ce%b9%ce%b1-%ce%b1%cf%83%ce%ba%ce%b7%cf%83%ce%b5%ce%b9%cf%82/",
-                "https://www.taexeiola.gr/%CF%83%CF%87%CE%BF%CE%BB%CE%B9%CE%BA%CE%BF-%CE%B2%CE%BF%CE%B7%CE%B8%CE%B7%CE%BC%CE%B1-%CE%BC%CE%B1%CE%B8%CE%B7%CE%BC%CE%B1%CF%84%CE%B9%CE%BA%CF%89%CE%BD-%CE%B3-%CE%B3%CF%85%CE%BC%CE%BD/"
-            ]
-        }
+        if not subject or not grade:
+             dispatcher.utter_message(text="Παρακαλώ πείτε μου το μάθημα και την τάξη (π.χ. 'Μαθηματικά Α Γυμνασίου').")
+             return []
 
+        # Helper to match DB format
         def clean_text(t):
             if not t: return ""
             rep = {'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω','ϊ':'ι','ϋ':'υ','ς':'σ'}
             s = t.lower()
             for k,v in rep.items(): s = s.replace(k,v)
-            return s
+            return s.capitalize()
 
-        normalized_subject = clean_text(subject)
-        # Check if subject is math-related
-        if not any(x in normalized_subject for x in ["μαθηματικα", "mathematics", "math"]):
-             dispatcher.utter_message(text="Δεν υπάρχει υλικό ακόμα για αυτό το μάθημα.")
-             return [SlotSet("subject", None), SlotSet("grade", None), FollowupAction("action_restart")]
-
-        selected_grade_key = None
-        norm_grade = clean_text(grade)
+        subj_clean = clean_text(subject)
         
-        if "α" in norm_grade and "γυμνασιου" in norm_grade: selected_grade_key = "A"
-        elif "β" in norm_grade and "γυμνασιου" in norm_grade: selected_grade_key = "B"
-        elif "γ" in norm_grade and "γυμνασιου" in norm_grade: selected_grade_key = "C"
-        elif "a" in norm_grade: selected_grade_key = "A"
-        elif "b" in norm_grade: selected_grade_key = "B"
-        elif "c" in norm_grade: selected_grade_key = "C"
-        
-        if not selected_grade_key:
-             # Heuristic for single letters
-             if "α" == norm_grade: selected_grade_key = "A"
-             elif "β" == norm_grade: selected_grade_key = "B"
-             elif "γ" == norm_grade: selected_grade_key = "C"
+        # Grade Normalization
+        norm_grade = clean_text(grade).upper()
+        grade_key = None
+        if "Α" in norm_grade or "A" in norm_grade: grade_key = "A"
+        elif "Β" in norm_grade or "B" in norm_grade: grade_key = "B"
+        elif "Γ" in norm_grade or "C" in norm_grade: grade_key = "C"
+        else: grade_key = norm_grade # Fallback
 
-        if selected_grade_key and selected_grade_key in links:
-             link = random.choice(links[selected_grade_key])
-             dispatcher.utter_message(text=f"Ορίστε ένα χρήσιμο link για τα Μαθηματικά της {selected_grade_key} τάξης:\n{link}")
+        print(f"DEBUG STUDY: Searching for Subject='{subj_clean}' Grade='{grade_key}'")
+
+        # Database Query
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Use LIKE for subject to be flexible (e.g. 'Math' vs 'Mathematics') or strict?
+        # Using strict for now based on upload logic, or partial match.
+        # Let's try partial match for subject.
+        c.execute("SELECT title, url FROM study_materials WHERE subject LIKE ? AND grade = ?", (f"%{subj_clean}%", grade_key))
+        rows = c.fetchall()
+        
+        conn.close()
+
+        if rows:
+             message = f"Βρήκα το εξής υλικό για {subject} {grade}:\n\n"
+             for row in rows:
+                 title, url = row
+                 message += f"- [{title}]({url})\n"
+             dispatcher.utter_message(text=message)
         else:
-             dispatcher.utter_message(text="Δεν βρέθηκε υλικό για τη συγκεκριμένη τάξη.")
+             # Fallback or empty message
+             dispatcher.utter_message(text=f"Δεν βρέθηκε υλικό για {subject} {grade} στη βάση μας.")
         
         return [SlotSet("subject", None), SlotSet("grade", None)]
 
@@ -1133,3 +1138,119 @@ class ActionVerifyRole(Action):
             dispatcher.utter_message(text="Καλωσήρθατε!")
 
         return []
+
+class ActionCheckStudyMaterialUploadPermissions(Action):
+    def name(self) -> Text:
+        return "action_check_study_material_upload_permissions"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # --- AUTH CHECK ---
+        # Reuse existing check
+        if not check_user_access(tracker):
+            dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες.")
+            return []
+
+        role = tracker.get_slot("role")
+        if not role:
+            metadata = tracker.latest_message.get("metadata", {})
+            user_data = metadata.get("customData", {}) or metadata
+            role = user_data.get("role")
+
+        print(f"DEBUG AUTH: Checking permissions for Study Material Upload. Role='{role}'")
+        
+        # Allow both Administrator and Member (same as exam upload for now, or Teacher)
+        if not role or role.lower() not in ["administrator", "member", "teacher"]:
+             dispatcher.utter_message(text="📢 Δεν έχετε δικαίωμα προσθήκης υλικού.")
+             return []
+        
+        return [FollowupAction("upload_study_material_form")]
+
+
+class ActionUploadStudyMaterial(Action):
+    def name(self) -> Text:
+        return "action_upload_study_material"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        # 1. Get Slots
+        file_path = tracker.get_slot("upload_file_path")
+        subject = tracker.get_slot("subject")
+        grade = tracker.get_slot("grade")
+
+        if not file_path or not os.path.exists(file_path):
+             dispatcher.utter_message(text=f"Δεν βρέθηκε το αρχείο: {file_path}")
+             return [SlotSet("upload_file_path", None)]
+
+        if not subject or not grade:
+             dispatcher.utter_message(text="Λείπουν στοιχεία (Μάθημα ή Τάξη).")
+             return []
+
+        # 2. Normalize Inputs
+        def clean_text(t):
+            if not t: return ""
+            rep = {'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω','ϊ':'ι','ϋ':'υ','ς':'σ'}
+            s = t.lower()
+            for k,v in rep.items(): s = s.replace(k,v)
+            return s.capitalize() # Capitalize for nice folder/title names
+
+        subj_clean = clean_text(subject)
+        grade_clean = clean_text(grade).upper() # Grades usually A, B, C or A_GYMNASIOU
+
+        # Simplification for Grade (keep just A, B, C if possible)
+        if "Α" in grade_clean or "A" in grade_clean: grade_short = "A"
+        elif "Β" in grade_clean or "B" in grade_clean: grade_short = "B"
+        elif "Γ" in grade_clean or "C" in grade_clean: grade_short = "C"
+        else: grade_short = grade_clean
+
+        # 3. Determine next ID
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # Get count for this Subject/Grade combo to generate ID
+        # Note: We rely on the Count of existing items + 1, or Max ID + 1?
+        # Max ID for this group is safer.
+        query = "SELECT MAX(id) FROM study_materials WHERE subject LIKE ? AND grade LIKE ?"
+        c.execute(query, (f"%{subj_clean}%", f"%{grade_short}%"))
+        result = c.fetchone()
+        
+        # We need a per-group counter, not global ID. 
+        # But global ID is autoinc. 
+        # Requirement: "Mαθημα_ταξη_αυξοντας αριθμος" (Subject_Grade_IncreasingNumber)
+        # So we need to count how many exist for this group.
+        c.execute("SELECT COUNT(*) FROM study_materials WHERE subject = ? AND grade = ?", (subj_clean, grade_short))
+        count = c.fetchone()[0]
+        next_num = count + 1
+        
+        generated_title = f"{subj_clean}_{grade_short}_{next_num}"
+        
+        # 4. Save File
+        # Directory: files/study_material/{Subject}/{Grade}/
+        # Or just flat: files/study_material/
+        dest_dir = "files/study_material"
+        os.makedirs(dest_dir, exist_ok=True)
+        
+        ext = os.path.splitext(file_path)[1]
+        new_filename = f"{generated_title}{ext}"
+        dest_path = os.path.join(dest_dir, new_filename)
+        
+        try:
+            import shutil
+            shutil.copy(file_path, dest_path)
+            
+            # Public URL
+            # Assuming standard mapping: files/ -> https://.../files/
+            public_url = f"https://104.155.53.205.nip.io/files/study_material/{new_filename}"
+
+            # 5. Insert into DB
+            c.execute("INSERT INTO study_materials (subject, grade, filename, title, url) VALUES (?, ?, ?, ?, ?)",
+                      (subj_clean, grade_short, new_filename, generated_title, public_url))
+            conn.commit()
+            
+            dispatcher.utter_message(text=f"✅ Το υλικό ανέβηκε επιτυχώς!\n\nΤίτλος: {generated_title}\nLink: {public_url}")
+            
+        except Exception as e:
+            print(f"ERROR Uploading Study Material: {e}")
+            dispatcher.utter_message(text=f"Παρουσιάστηκε σφάλμα κατά το ανέβασμα: {e}")
+        finally:
+            conn.close()
+
+        return [SlotSet("upload_file_path", None), SlotSet("subject", None), SlotSet("grade", None)]

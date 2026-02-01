@@ -146,6 +146,12 @@ forms:
         - grade
         - difficulty
 
+  upload_study_material_form:
+    required_slots:
+        - upload_file_path
+        - subject
+        - grade
+
   study_material_form:
     required_slots:
         - subject
@@ -235,6 +241,8 @@ actions:
   - action_provide_study_material
   - action_check_create_exam_permissions
   - action_verify_role
+  - action_upload_study_material
+  - action_check_study_material_upload_permissions
 
 
 session_config:
