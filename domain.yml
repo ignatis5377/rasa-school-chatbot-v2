@@ -26,6 +26,7 @@ intents:
   - inform_role_teacher
 
   - ask_study_material
+  - upload_study_material
   - upload_exam_material
 
 
@@ -138,6 +139,40 @@ slots:
       conditions:
       - active_loop: upload_study_material_form
         requested_slot: upload_link
+        
+  exam_subject:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: subject
+    - type: from_text
+      conditions:
+      - active_loop: exam_form
+        requested_slot: exam_subject
+      - active_loop: upload_exam_form
+        requested_slot: exam_subject
+
+  exam_grade:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: grade
+    - type: from_text
+      conditions:
+      - active_loop: exam_form
+        requested_slot: exam_grade
+      - active_loop: upload_exam_form
+        requested_slot: exam_grade
+
+  number_of_questions:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: num_questions
+    - type: from_text
+      conditions:
+      - active_loop: exam_form
+        requested_slot: number_of_questions
 
 forms:
   exam_form:
