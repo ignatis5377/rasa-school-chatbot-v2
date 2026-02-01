@@ -130,7 +130,6 @@ rules:
 - rule: Respond to Teacher Role
   steps:
   - intent: inform_role_teacher
-  - intent: inform_role_teacher
   - action: action_verify_role
 
 - rule: Check Permissions for Study Material Upload
