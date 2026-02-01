@@ -54,10 +54,6 @@ slots:
       entity: subject
     - type: from_text
       conditions:
-      - active_loop: exam_form
-        requested_slot: subject
-      - active_loop: upload_exam_form
-        requested_slot: subject
       - active_loop: study_material_form
         requested_slot: subject
   
@@ -68,10 +64,6 @@ slots:
       entity: grade
     - type: from_text
       conditions:
-      - active_loop: exam_form
-        requested_slot: grade
-      - active_loop: upload_exam_form
-        requested_slot: grade
       - active_loop: study_material_form
         requested_slot: grade
 
@@ -110,8 +102,6 @@ slots:
     - type: from_text
       conditions:
       - active_loop: exam_form
-        requested_slot: difficulty
-      - active_loop: upload_exam_form
         requested_slot: difficulty
 
   num_questions:
