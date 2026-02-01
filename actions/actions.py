@@ -1025,13 +1025,18 @@ class ActionProvideStudyMaterial(Action):
         
         # Grade Normalization
         norm_grade = clean_text(grade).upper()
-        grade_key = None
-        if "Α" in norm_grade or "A" in norm_grade: grade_key = "A"
-        elif "Β" in norm_grade or "B" in norm_grade: grade_key = "B"
-        elif "Γ" in norm_grade or "C" in norm_grade: grade_key = "C"
-        else: grade_key = norm_grade # Fallback
-
-        print(f"DEBUG STUDY: Searching for Subject='{subj_clean}' Grade='{grade_key}'")
+        grade_key = norm_grade # Fallback default
+        
+        import re
+        # Look for standalone A, B, C, Γ, Beta, Alpha
+        if re.search(r'\b(A|Α)\b', norm_grade):
+             grade_key = "A"
+        elif re.search(r'\b(B|Β)\b', norm_grade):
+             grade_key = "B"
+        elif re.search(r'\b(C|Γ)\b', norm_grade):
+             grade_key = "C"
+        
+        print(f"DEBUG STUDY: Searching for Subject='{subj_clean}' RawGrade='{norm_grade}' Key='{grade_key}'")
 
         # Database Query
         conn = sqlite3.connect(DB_PATH)
@@ -1080,7 +1085,15 @@ class ActionUploadStudyMaterial(Action):
 
         subj_clean = clean_text(subject)
         norm_grade = clean_text(grade).upper()
-        grade_key = "A" if "Α" in norm_grade or "A" in norm_grade else "B" if "Β" in norm_grade or "B" in norm_grade else "C" if "Γ" in norm_grade or "C" in norm_grade else norm_grade
+        grade_key = norm_grade # Default
+        
+        import re
+        if re.search(r'\b(A|Α)\b', norm_grade):
+             grade_key = "A"
+        elif re.search(r'\b(B|Β)\b', norm_grade):
+             grade_key = "B"
+        elif re.search(r'\b(C|Γ)\b', norm_grade):
+             grade_key = "C"
         
         # Generate Title like: Mathematics_A_1
         # Need current count to increment
