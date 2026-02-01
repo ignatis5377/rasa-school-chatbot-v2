@@ -99,8 +99,6 @@ slots:
       conditions:
       - active_loop: upload_exam_form
         requested_slot: upload_file_path
-      - active_loop: upload_study_material_form
-        requested_slot: upload_file_path
 
 
   difficulty:
@@ -232,7 +230,7 @@ responses:
   - text: "Υπεύθυνος Γραμματείας είναι ο εκπαιδευτικός Λασκαρίδης Ιγνάτιος."
 
   utter_default:
-  - text: "Παρακαλώ δώστε έγκυρη απάντηση"
+  - text: "Συγνώμη αλλά δεν κατάλαβα. Θέλετε να με ρωτήσετε κάτι άλλο?"
 
 actions:
   - action_create_exam_new
