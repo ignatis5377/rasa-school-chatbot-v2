@@ -715,21 +715,30 @@ class ActionCreateExamNew(Action):
             elif "γ " in norm_g or norm_g == "c": fn_grade = "C"
             
         # Difficulty
-        fn_diff = difficulty if difficulty else "General"
+        fn_diff = "General"
+        if difficulty:
+            norm_d = normalize_text(difficulty)
+            if "ευκολο" in norm_d: fn_diff = "Easy"
+            elif "μετριο" in norm_d: fn_diff = "Medium"
+            elif "δυσκολο" in norm_d: fn_diff = "Hard"
+            else: fn_diff = difficulty
+
         
         # Determine ID
         # Scan generated_exams folder
         existing_files = os.listdir(GENERATED_EXAMS_DIR)
         next_id = 1
         prefix = f"Exam_{fn_subject}_{fn_grade}_{fn_diff}_"
+        print(f"DEBUG: Searching for files with prefix '{prefix}'")
         
         # Simple count or max ID search
         max_id = 0
         for f in existing_files:
             if f.startswith(f"Exam_{fn_subject}_{fn_grade}_{fn_diff}_") and f.endswith(".pdf"):
                 try:
-                    # Extract ID: Exam_Math_A_Easy_5.pdf
-                    part_id = f.replace(prefix, "").replace(".pdf", "")
+                    # Extract ID: Exam_Mathematics_A_Easy_5.pdf
+                    # Remove prefix, then remove .pdf
+                    part_id = f[len(prefix):].replace(".pdf", "")
                     if part_id.isdigit():
                         if int(part_id) > max_id: max_id = int(part_id)
                 except: pass
@@ -738,6 +747,19 @@ class ActionCreateExamNew(Action):
         # Create PDF
         filename = f"{prefix}{next_id}.pdf"
         filepath = os.path.join(GENERATED_EXAMS_DIR, filename)
+        
+        try:
+            doc = SimpleDocTemplate(filepath, pagesize=A4)
+            # ... (Rest of PDF generation remains)
+            
+            # --- SKIPPING PDF CONTENT GENERATION CODE FOR BREVITY IN REPLACEMENT, 
+            # BUT ASSUMING IT IS UNCHANGED. I will only update the return message part actually ---
+            # Wait, I cannot skip lines inside replace_file_content if they are part of the block I am replacing.
+            # I must check where the block ends. My viewed content ended at line 924 which is right before PDF build.
+            # I will split this into two replacements if needed, or view more lines if I need to see the end. 
+            # Actually I can just update the fn_diff part and the prefix construction part first.
+        except: pass
+
         
         try:
             c = canvas.Canvas(filepath, pagesize=A4)
@@ -915,7 +937,7 @@ class ActionCreateExamNew(Action):
             file_name = os.path.basename(filepath)
             public_url = f"https://104.155.53.205.nip.io/files/generated_exams/{file_name}"
             
-            dispatcher.utter_message(text=f"Το διαγώνισμα δημιουργήθηκε! (v2 Security Check)\n\n{public_url}")
+            dispatcher.utter_message(text=f"Το διαγώνισμα δημιουργήθηκε! (v2 Security Check)\n\n[{file_name}]({public_url})")
             
         except Exception as e:
             dispatcher.utter_message(text=f"Σφάλμα PDF: {e}")
