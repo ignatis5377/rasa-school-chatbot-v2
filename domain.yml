@@ -227,6 +227,12 @@ responses:
   utter_ask_grade:
   - text: "Για ποια τάξη (π.χ. Α Γυμνασίου);"
 
+  utter_ask_exam_grade:
+  - text: "Για ποια τάξη θέλετε το διαγώνισμα;"
+
+  utter_ask_exam_subject:
+  - text: "Σε ποιο μάθημα να εξεταστείτε;"
+
   utter_ask_include_answers:
   - text: "Θέλετε να συμπεριληφθούν οι απαντήσεις;"
 

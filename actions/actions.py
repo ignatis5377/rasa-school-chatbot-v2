@@ -599,13 +599,16 @@ class ActionCreateExamNew(Action):
 
         print("DEBUG: Entered ActionCreateExam - IF YOU SEE THIS, IT WORKS")
 
-        subject = tracker.get_slot("subject")
+        # Custom slot retrieval to support both exam_form and manual entry
+        subject = tracker.get_slot("exam_subject") if tracker.get_slot("exam_subject") else tracker.get_slot("subject")
+        grade = tracker.get_slot("exam_grade") if tracker.get_slot("exam_grade") else tracker.get_slot("grade")
         difficulty = tracker.get_slot("difficulty")
-        grade = tracker.get_slot("grade")
         include_answers = tracker.get_slot("include_answers")
         
         # 1. Dynamic Question Count
-        num_questions = tracker.get_slot("num_questions")
+        num_questions = tracker.get_slot("number_of_questions") # Updated to match form slot name if changed, else "num_questions"
+        if not num_questions: num_questions = tracker.get_slot("num_questions")
+
         if not num_questions:
             num_questions = 3
         else:
@@ -625,10 +628,14 @@ class ActionCreateExamNew(Action):
         
         if grade:
             raw_grade = str(grade).lower().strip()
+            # Check for single letter input first
             if raw_grade in grade_map_input:
                 grade = grade_map_input[raw_grade]
             elif len(raw_grade) == 1:
-                 grade = f"{grade.upper()} Γυμνασίου"
+                 # Try to map 'A' 'B' 'C' directly if missed
+                 if raw_grade == 'a': grade = "Α Γυμνασίου"
+                 elif raw_grade == 'b': grade = "Β Γυμνασίου"
+                 elif raw_grade == 'c': grade = "Γ Γυμνασίου"
 
         # Accent Stripping & Lowercasing Helper
         def normalize_text(input_str):
@@ -663,8 +670,15 @@ class ActionCreateExamNew(Action):
             query += " AND NORMALIZE(difficulty) = NORMALIZE(?)"
             params.append(difficulty)
         if grade:
-            query += " AND NORMALIZE(class_name) = NORMALIZE(?)"
-            params.append(grade)
+            # Flexible grade match
+            query += " AND NORMALIZE(class_name) LIKE NORMALIZE(?)"
+            # If grade is "Α Γυμνασίου", we match "%Α%" logic handled in code or here?
+            # Let's clean grade for SQL
+            clean_grade = normalize_text(grade)
+            if "α " in clean_grade: params.append("%Α%")
+            elif "β " in clean_grade: params.append("%Β%")
+            elif "γ " in clean_grade: params.append("%Γ%")
+            else: params.append(f"%{clean_grade}%")
             
         print(f"DEBUG SQL: {query} | Params: {params}")
         
@@ -675,32 +689,54 @@ class ActionCreateExamNew(Action):
         rows = c.fetchall()
         
         if not rows:
-            # Fallback: Try looser Grade Match (e.g. match 'B' inside 'B Gymnasioy')
-            print("DEBUG: Strict match failed. Trying loose grade match.")
-            query = "SELECT * FROM questions WHERE REMOVE_ACCENTS(LOWER(subject)) = REMOVE_ACCENTS(LOWER(?))"
-            params = [subject]
-            
-            # Simple Grade check
-            # Just grab any grade starting with the letter if simple letter provided
-            if len(grade) == 1 or "Γυμνασίου" not in grade:
-                 # Logic for fallback
-                 pass 
-            
-            # Re-execute query without grade strictness? No, that's dangerous.
-            # Let's just report failure but with more info.
-            
-            c.execute("SELECT DISTINCT subject, class_name, difficulty FROM questions")
-            available = c.fetchall()
-            print(f"DEBUG: Available in DB: {[dict(row) for row in available]}")
-            
-            conn.close()
-            dispatcher.utter_message(text=f"Δεν βρέθηκαν ερωτήσεις. Έψαξα για: {subject}, {grade}, {difficulty}.")
-            return []
+             conn.close()
+             dispatcher.utter_message(text=f"Δεν βρέθηκαν ερωτήσεις για {subject} ({grade}) - {difficulty}.")
+             return []
         
         conn.close()
 
+        # Create Short Filename Parts
+        # Subject
+        fn_subject = "Subj"
+        if subject:
+            norm_s = normalize_text(subject)
+            if "μαθηματ" in norm_s: fn_subject = "Mathematics"
+            elif "υσικ" in norm_s: fn_subject = "Physics"
+            elif "στορ" in norm_s: fn_subject = "History"
+            elif "λογοτ" in norm_s: fn_subject = "Literature"
+            else: fn_subject = subject.capitalize()
+            
+        # Grade 
+        fn_grade = "G"
+        if grade:
+            norm_g = normalize_text(grade)
+            if "α " in norm_g or norm_g == "a": fn_grade = "A"
+            elif "β " in norm_g or norm_g == "b": fn_grade = "B"
+            elif "γ " in norm_g or norm_g == "c": fn_grade = "C"
+            
+        # Difficulty
+        fn_diff = difficulty if difficulty else "General"
+        
+        # Determine ID
+        # Scan generated_exams folder
+        existing_files = os.listdir(GENERATED_EXAMS_DIR)
+        next_id = 1
+        prefix = f"Exam_{fn_subject}_{fn_grade}_{fn_diff}_"
+        
+        # Simple count or max ID search
+        max_id = 0
+        for f in existing_files:
+            if f.startswith(f"Exam_{fn_subject}_{fn_grade}_{fn_diff}_") and f.endswith(".pdf"):
+                try:
+                    # Extract ID: Exam_Math_A_Easy_5.pdf
+                    part_id = f.replace(prefix, "").replace(".pdf", "")
+                    if part_id.isdigit():
+                        if int(part_id) > max_id: max_id = int(part_id)
+                except: pass
+        next_id = max_id + 1
+
         # Create PDF
-        filename = f"Exam_{subject}_{difficulty}_{random.randint(1000,9999)}.pdf"
+        filename = f"{prefix}{next_id}.pdf"
         filepath = os.path.join(GENERATED_EXAMS_DIR, filename)
         
         try:
