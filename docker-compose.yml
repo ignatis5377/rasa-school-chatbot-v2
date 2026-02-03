@@ -39,6 +39,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
       - ./files:/usr/share/nginx/html/files
+      - ./index.html:/usr/share/nginx/html/index.html
     depends_on:
       - rasa
 
