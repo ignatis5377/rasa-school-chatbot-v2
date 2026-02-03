@@ -1,0 +1,10 @@
+.git
+.rasa
+models/*.tar.gz
+*.pyc
+__pycache__
+tests/
+venv/
+*.md
+*.docx
+.DS_Store
