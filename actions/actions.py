@@ -665,6 +665,15 @@ class ActionCreateExamNew(Action):
         if any(x in raw_grade for x in ["Α", "A", "ΠΡΩΤΗ", "PRWTH"]): grade = "Α Γυμνασίου"
         elif any(x in raw_grade for x in ["Β", "B", "ΔΕΥΤΕΡΑ", "DEUTERA"]): grade = "Β Γυμνασίου"
         elif any(x in raw_grade for x in ["Γ", "C", "ΤΡΙΤΗ", "TRITH"]): grade = "Γ Γυμνασίου"
+        
+        # FIX: Strict Regex to avoid partial matches (e.g. 'A' in 'DEUTERA')
+        import re
+        if any(x in raw_grade for x in ["ΠΡΩΤΗ", "PRWTH"]): grade = "Α Γυμνασίου"
+        elif any(x in raw_grade for x in ["ΔΕΥΤΕΡΑ", "DEUTERA"]): grade = "Β Γυμνασίου"
+        elif any(x in raw_grade for x in ["ΤΡΙΤΗ", "TRITH"]): grade = "Γ Γυμνασίου"
+        elif re.search(r'\b(A|Α)\b', raw_grade): grade = "Α Γυμνασίου"
+        elif re.search(r'\b(B|Β)\b', raw_grade): grade = "Β Γυμνασίου"
+        elif re.search(r'\b(C|Γ)\b', raw_grade): grade = "Γ Γυμνασίου"
 
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
@@ -1100,12 +1109,17 @@ class ActionProvideStudyMaterial(Action):
         grade_key = raw_grade # Fallback
         
         # Enhanced Mapping
-        if any(x in raw_grade for x in ["Α", "A", "ΠΡΩΤΗ", "PRWTH"]): 
+        import re
+        # Enhanced Mapping with Regex
+        if any(x in raw_grade for x in ["ΠΡΩΤΗ", "PRWTH"]): 
             grade_key = "A"
-        elif any(x in raw_grade for x in ["Β", "B", "ΔΕΥΤΕΡΑ", "DEUTERA"]): 
+        elif any(x in raw_grade for x in ["ΔΕΥΤΕΡΑ", "DEUTERA"]): 
             grade_key = "B"
-        elif any(x in raw_grade for x in ["Γ", "C", "ΤΡΙΤΗ", "TRITH"]): 
+        elif any(x in raw_grade for x in ["ΤΡΙΤΗ", "TRITH"]): 
             grade_key = "C"
+        elif re.search(r'\b(A|Α)\b', raw_grade): grade_key = "A"
+        elif re.search(r'\b(B|Β)\b', raw_grade): grade_key = "B"
+        elif re.search(r'\b(C|Γ)\b', raw_grade): grade_key = "C"
         
         print(f"DEBUG STUDY: Searching for Subject='{subj_clean}' RawGrade='{raw_grade}' Key='{grade_key}'")
 
@@ -1160,12 +1174,12 @@ class ActionUploadStudyMaterial(Action):
         grade_key = norm_grade # Default
         
         import re
-        if re.search(r'\b(A|Α)\b', norm_grade):
-             grade_key = "A"
-        elif re.search(r'\b(B|Β)\b', norm_grade):
-             grade_key = "B"
-        elif re.search(r'\b(C|Γ)\b', norm_grade):
-             grade_key = "C"
+        if any(x in norm_grade for x in ["ΠΡΩΤΗ", "PRWTH"]): grade_key = "A"
+        elif any(x in norm_grade for x in ["ΔΕΥΤΕΡΑ", "DEUTERA"]): grade_key = "B"
+        elif any(x in norm_grade for x in ["ΤΡΙΤΗ", "TRITH"]): grade_key = "C"
+        elif re.search(r'\b(A|Α)\b', norm_grade): grade_key = "A"
+        elif re.search(r'\b(B|Β)\b', norm_grade): grade_key = "B"
+        elif re.search(r'\b(C|Γ)\b', norm_grade): grade_key = "C"
         
         # Generate Title like: Mathematics_A_1
         # Need current count to increment
