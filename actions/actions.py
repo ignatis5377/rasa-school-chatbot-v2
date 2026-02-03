@@ -665,18 +665,6 @@ class ActionCreateExamNew(Action):
         if any(x in raw_grade for x in ["Α", "A", "ΠΡΩΤΗ", "PRWTH"]): grade = "Α Γυμνασίου"
         elif any(x in raw_grade for x in ["Β", "B", "ΔΕΥΤΕΡΑ", "DEUTERA"]): grade = "Β Γυμνασίου"
         elif any(x in raw_grade for x in ["Γ", "C", "ΤΡΙΤΗ", "TRITH"]): grade = "Γ Γυμνασίου"
-            if not input_str: return ""
-            # 1. Lowercase (Python handles Greek correctly)
-            s = input_str.lower()
-            
-            # 2. Remove Accents
-            replacements = {
-                'ά': 'α', 'έ': 'ε', 'ή': 'η', 'ί': 'ι', 'ό': 'ο', 'ύ': 'υ', 'ώ': 'ω',
-                'ϊ': 'ι', 'ϋ': 'υ', 'ς': 'σ' # Normalize final sigma too
-            }
-            for char, repl in replacements.items():
-                s = s.replace(char, repl)
-            return s
 
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
