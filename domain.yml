@@ -24,6 +24,7 @@ intents:
   - inform_role_student
   - inform_role_parent
   - inform_role_teacher
+  - thankyou
 
   - ask_study_material
   - upload_study_material
@@ -269,6 +270,9 @@ responses:
 
   utter_default:
   - text: "Συγνώμη αλλά δεν κατάλαβα. Θέλετε να με ρωτήσετε κάτι άλλο?"
+
+  utter_youarewelcome:
+  - text: "Παρακαλώ! Χαίρομαι που βοήθησα. Χρειάζεστε κάτι άλλο;"
 
 actions:
   - action_create_exam_new

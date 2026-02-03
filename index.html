@@ -22,10 +22,6 @@
             (e.src = "https://cdn.jsdelivr.net/npm/rasa-webchat@1.0.1/lib/index.js"),
                 (e.async = !0),
                 (e.onload = () => {
-                    // Force clear storage to reset session on every refresh
-                    window.localStorage.clear();
-                    window.sessionStorage.clear();
-
                     window.WebChat.default(
                         {
                             selector: "#webchat",
@@ -33,10 +29,8 @@
                             customData: { "language": "el" },
                             socketUrl: "http://localhost:5005",
                             socketPath: "/socket.io/",
-                            title: "Digital School Assistant",
-                            socketPath: "/socket.io/",
-                            title: "Digital School Assistant",
-                            subtitle: "Ask me anything!",
+                            title: "Ψηφιακός βοηθός του σχολείου",
+                            subtitle: "Ρώτησέ με ό,τι θες!",
                             storage: "session",
                         },
                         null

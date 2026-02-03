@@ -168,3 +168,8 @@ rules:
   steps:
   - intent: nlu_fallback
   - action: action_handle_fallback
+
+- rule: Respond to Thank You
+  steps:
+  - intent: thankyou
+  - action: utter_youarewelcome

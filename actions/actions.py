@@ -147,7 +147,8 @@ def check_user_access(tracker: Tracker) -> bool:
 
     # Check Slots (Backup)
     slot_role = tracker.get_slot("role")
-    if slot_role == "member":
+    # FIX: Allow 'teacher', 'admin', 'member' via Slot
+    if slot_role and slot_role.lower() in ["member", "teacher", "administrator", "admin"]:
          print(f"DEBUG AUTH: Found role in SLOT: {slot_role}")
          return True
 
@@ -592,10 +593,20 @@ class ActionCreateExamNew(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
         # --- AUTH CHECK ---
+        # Note: If triggered via Rule, permissions were likely checked before form.
+        # But redundant check is safe.
         if not check_user_access(tracker):
-            dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες. Παρακαλώ συνδεθείτε στην ιστοσελίδα!")
+            dispatcher.utter_message(text="🚫 Αυτή η λειτουργία είναι διαθέσιμη μόνο για εγγεγραμμένους χρήστες.")
             return []
         # ------------------
+        
+        # 0. Safety Check for Slots
+        s_subj = tracker.get_slot("exam_subject") or tracker.get_slot("subject")
+        s_grade = tracker.get_slot("exam_grade") or tracker.get_slot("grade")
+        
+        if not s_subj or not s_grade:
+             dispatcher.utter_message(text="Για ποιο μάθημα και ποια τάξη θέλετε το διαγώνισμα;")
+             return []
 
         print("DEBUG: Entered ActionCreateExam - IF YOU SEE THIS, IT WORKS")
 
@@ -639,6 +650,21 @@ class ActionCreateExamNew(Action):
 
         # Accent Stripping & Lowercasing Helper
         def normalize_text(input_str):
+            if not input_str: return ""
+            s = input_str.lower()
+            replacements = {
+                'ά': 'α', 'έ': 'ε', 'ή': 'η', 'ί': 'ι', 'ό': 'ο', 'ύ': 'υ', 'ώ': 'ω',
+                'ϊ': 'ι', 'ϋ': 'υ', 'ς': 'σ'
+            }
+            for char, repl in replacements.items():
+                s = s.replace(char, repl)
+            return s
+            
+        # Grade Normalization (Expanded)
+        raw_grade = normalize_text(grade).upper()
+        if any(x in raw_grade for x in ["Α", "A", "ΠΡΩΤΗ", "PRWTH"]): grade = "Α Γυμνασίου"
+        elif any(x in raw_grade for x in ["Β", "B", "ΔΕΥΤΕΡΑ", "DEUTERA"]): grade = "Β Γυμνασίου"
+        elif any(x in raw_grade for x in ["Γ", "C", "ΤΡΙΤΗ", "TRITH"]): grade = "Γ Γυμνασίου"
             if not input_str: return ""
             # 1. Lowercase (Python handles Greek correctly)
             s = input_str.lower()
@@ -1068,7 +1094,7 @@ class ActionProvideStudyMaterial(Action):
         grade = tracker.get_slot("grade")
 
         if not subject or not grade:
-             dispatcher.utter_message(text="Παρακαλώ πείτε μου το μάθημα και την τάξη (π.χ. 'Μαθηματικά Α Γυμνασίου').")
+             dispatcher.utter_message(text="Για ποιο μάθημα και ποια τάξη ενδιαφέρεστε; (π.χ. 'Μαθηματικά Α Γυμνασίου')")
              return []
 
         # Helper to match DB format
@@ -1081,20 +1107,19 @@ class ActionProvideStudyMaterial(Action):
 
         subj_clean = clean_text(subject)
         
-        # Grade Normalization
-        norm_grade = clean_text(grade).upper()
-        grade_key = norm_grade # Fallback default
+        # Grade Normalization (Expanded)
+        raw_grade = clean_text(grade).upper()
+        grade_key = raw_grade # Fallback
         
-        import re
-        # Look for standalone A, B, C, Γ, Beta, Alpha
-        if re.search(r'\b(A|Α)\b', norm_grade):
-             grade_key = "A"
-        elif re.search(r'\b(B|Β)\b', norm_grade):
-             grade_key = "B"
-        elif re.search(r'\b(C|Γ)\b', norm_grade):
-             grade_key = "C"
+        # Enhanced Mapping
+        if any(x in raw_grade for x in ["Α", "A", "ΠΡΩΤΗ", "PRWTH"]): 
+            grade_key = "A"
+        elif any(x in raw_grade for x in ["Β", "B", "ΔΕΥΤΕΡΑ", "DEUTERA"]): 
+            grade_key = "B"
+        elif any(x in raw_grade for x in ["Γ", "C", "ΤΡΙΤΗ", "TRITH"]): 
+            grade_key = "C"
         
-        print(f"DEBUG STUDY: Searching for Subject='{subj_clean}' RawGrade='{norm_grade}' Key='{grade_key}'")
+        print(f"DEBUG STUDY: Searching for Subject='{subj_clean}' RawGrade='{raw_grade}' Key='{grade_key}'")
 
         # Database Query
         conn = sqlite3.connect(DB_PATH)
@@ -1115,9 +1140,10 @@ class ActionProvideStudyMaterial(Action):
                  message += f"[{title}]({url})\n"
              dispatcher.utter_message(text=message)
         else:
-             dispatcher.utter_message(text=f"Δεν βρέθηκε υλικό για {subject} {grade}.")
+             dispatcher.utter_message(text=f"Δεν βρέθηκε υλικό για {subject} ({grade_key} Γυμνασίου). Δοκιμάστε άλλο μάθημα ή τάξη!")
         
-        return [SlotSet("subject", None), SlotSet("grade", None)]
+        # DO NOT Reset slots immediately to allow "Actually for History" corrections
+        return []
 
 
 class ActionUploadStudyMaterial(Action):
@@ -1193,7 +1219,7 @@ class ActionHandleFallback(Action):
         
         print(f"DEBUG FALLBACK: Consecutive Count = {count}")
 
-        if count < 3:
+        if count < 5:
              dispatcher.utter_message(text="Συγνώμη, δεν κατάλαβα. Μπορείτε να το διατυπώσετε διαφορετικά;")
              return []
         else:
@@ -1261,7 +1287,8 @@ class ActionVerifyRole(Action):
              print("DEBUG ACTION: Fallback greeting")
              dispatcher.utter_message(text="Καλωσήρθατε!")
 
-        return []
+        # Fix: REMEMBER THE ROLE
+        return [SlotSet("role", target_role)]
 
 class ActionCheckStudyMaterialUploadPermissions(Action):
     def name(self) -> Text:
