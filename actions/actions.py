@@ -1221,11 +1221,22 @@ class ActionHandleFallback(Action):
         
         print(f"DEBUG FALLBACK: Consecutive Count = {count}")
 
-        if count < 5:
-             dispatcher.utter_message(text="Συγνώμη, δεν κατάλαβα. Μπορείτε να το διατυπώσετε διαφορετικά;")
+        if count < 2:
+             dispatcher.utter_message(text="Συγνώμη αλλά δεν κατάλαβα. Θέλετε να με ρωτήσετε κάτι άλλο?")
              return []
         else:
-             dispatcher.utter_message(response="utter_default")
+             # Reset on 3rd failure (count >= 2 because current is excluded in loop logic above? Wait, logic check:
+             # loop count counts *previous* nlu_fallbacks.
+             # If I have 2 previous fallbacks + current one -> total 3.
+             # So if count (previous) < 2 -> 0 or 1 previous. 
+             # If I want to fail on the 3rd time (after 2 failures), then:
+             # 1st fail: 0 prev. < 2. Say sorry.
+             # 2nd fail: 1 prev. < 2. Say sorry.
+             # 3rd fail: 2 prev. == 2. Reset.
+             # Yes. This logic works for "After 2 consecutive times... next time".
+             
+             # User Request: "την επομενη φορά να εμφανίζει το αρχικο μηνυμα... και να κανει επανεκινηση"
+             dispatcher.utter_message(text="Γειά σας! Ειστε μαθητής, γονέας ή εκπαιδευτικός του σχολείου?")
              return [Restarted()]
 
 class ActionCheckCreateExamPermissions(Action):

@@ -24,7 +24,9 @@ intents:
   - inform_role_student
   - inform_role_parent
   - inform_role_teacher
+  - inform_role_teacher
   - thankyou
+  - restart_conversation
 
   - ask_study_material
   - upload_study_material
@@ -273,6 +275,9 @@ responses:
 
   utter_youarewelcome:
   - text: "Παρακαλώ! Χαίρομαι που βοήθησα. Χρειάζεστε κάτι άλλο;"
+
+  utter_restart_now:
+  - text: "Ωραία, κάνω επανεκκίνηση..."
 
 actions:
   - action_create_exam_new

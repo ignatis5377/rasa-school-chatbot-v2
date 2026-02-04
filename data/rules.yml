@@ -173,3 +173,16 @@ rules:
   steps:
   - intent: thankyou
   - action: utter_youarewelcome
+
+- rule: Restart Conversation
+  steps:
+  - intent: restart_conversation
+  - action: utter_restart_now
+  - action: action_restart
+
+- rule: Restart after Thank You deny
+  steps:
+  - intent: thankyou
+  - action: utter_youarewelcome
+  - intent: deny
+  - action: action_restart
