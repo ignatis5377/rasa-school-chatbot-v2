@@ -24,9 +24,9 @@ intents:
   - inform_role_student
   - inform_role_parent
   - inform_role_teacher
-  - inform_role_teacher
   - thankyou
   - restart_conversation
+  - deny
 
   - ask_study_material
   - upload_study_material

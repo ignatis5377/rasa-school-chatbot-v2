@@ -474,6 +474,8 @@ nlu:
     - αναρτηση υλικού διαβασματος
     - Αναρτηση υλικού μελετης
     
+- intent: thankyou
+  examples: |
     - Ευχαριστώ
 
 - intent: restart_conversation
