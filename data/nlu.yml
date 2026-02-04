@@ -478,6 +478,19 @@ nlu:
   examples: |
     - Ευχαριστώ
 
+- intent: deny
+  examples: |
+    - όχι
+    - οχι
+    - no
+    - δεν θέλω
+    - με τίποτα
+    - όχι ευχαριστώ
+    - οχι ευχαριστω
+    - not really
+    - nope
+    - n
+
 - intent: restart_conversation
   examples: |
     - Κάνε επανεκκίνηση

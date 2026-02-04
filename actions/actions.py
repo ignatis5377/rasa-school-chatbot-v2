@@ -1211,15 +1211,22 @@ class ActionHandleFallback(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         count = 0 
+        print("DEBUG FALLBACK: Starting history check...")
         for event in reversed(tracker.events):
              if event.get("event") == "user":
-                 intent = event.get("parse_data", {}).get("intent", {}).get("name")
+                 parse_data = event.get("parse_data", {})
+                 intent = parse_data.get("intent", {}).get("name")
+                 conf = parse_data.get("intent", {}).get("confidence")
+                 text = event.get("text")
+                 print(f"DEBUG FALLBACK: Found User Event - Text: '{text}' | Intent: '{intent}' ({conf})")
+                 
                  if intent == "nlu_fallback":
                      count += 1
                  else:
+                     print(f"DEBUG FALLBACK: Breaking chain at intent '{intent}'")
                      break
         
-        print(f"DEBUG FALLBACK: Consecutive Count = {count}")
+        print(f"DEBUG FALLBACK: Final Consecutive Count = {count}")
 
         if count < 2:
              dispatcher.utter_message(text="Συγνώμη αλλά δεν κατάλαβα. Θέλετε να με ρωτήσετε κάτι άλλο?")
