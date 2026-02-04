@@ -1141,11 +1141,11 @@ class ActionProvideStudyMaterial(Action):
                  title, url = row
                  message += f"[{title}]({url})\n"
              dispatcher.utter_message(text=message)
+             return []
         else:
-             dispatcher.utter_message(text=f"Δεν βρέθηκε υλικό για {subject} ({grade_key} Γυμνασίου). Δοκιμάστε άλλο μάθημα ή τάξη!")
-        
-        # DO NOT Reset slots immediately to allow "Actually for History" corrections
-        return []
+             dispatcher.utter_message(text=f"Δεν βρέθηκε υλικό για {subject} ({grade_key} Γυμνασίου).")
+             # FIX: Reset slots and restart form so user can try again immediately
+             return [SlotSet("subject", None), SlotSet("grade", None), FollowupAction("study_material_form")]
 
 
 class ActionUploadStudyMaterial(Action):
