@@ -175,7 +175,22 @@ rules:
   - action: utter_youarewelcome
 
 - rule: Restart Conversation
+  condition:
+  # Condition logic: applies even if loop is active
+  - active_loop: null
   steps:
   - intent: restart_conversation
+  - action: utter_restart_now
+  - action: action_restart
+
+- rule: Restart Conversation (Loop)
+  condition:
+  - active_loop: study_material_form
+  steps:
+  - intent: restart_conversation
+  - action: action_deactivate_loop
+  - active_loop: null
+  - action: utter_restart_now
+  - action: action_restart
   - action: utter_restart_now
   - action: action_restart

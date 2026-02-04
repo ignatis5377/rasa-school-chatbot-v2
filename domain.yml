@@ -59,6 +59,12 @@ slots:
       conditions:
       - active_loop: study_material_form
         requested_slot: subject
+      not_intent:
+        - restart_conversation
+        - deny
+        - thankyou
+        - goodbye
+        - bot_challenge
   
   grade:
     type: text
@@ -69,6 +75,12 @@ slots:
       conditions:
       - active_loop: study_material_form
         requested_slot: grade
+      not_intent:
+        - restart_conversation
+        - deny
+        - thankyou
+        - goodbye
+        - bot_challenge
 
   include_answers:
     type: bool
