@@ -12,3 +12,10 @@ stories:
 
 
 
+
+- story: Restart after Thank You deny
+  steps:
+  - intent: thankyou
+  - action: utter_youarewelcome
+  - intent: deny
+  - action: action_restart
