@@ -22,6 +22,7 @@ intents:
   - faq_excursions
   - faq_exams
   - faq_admission
+  - faq_regulations
   - create_exam
   - search_website
   - inform_role_student

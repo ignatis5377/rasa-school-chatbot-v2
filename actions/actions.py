@@ -1041,6 +1041,7 @@ class ActionSmartFaq(Action):
             "faq_excursions":               {"q": "σχολικές εκδρομές",     "url": "https://ignatislask.sites.sch.gr/?cat=5"},
             "faq_exams":                    {"q": "εξετάσεις γυμνάσιο",    "url": "https://ignatislask.sites.sch.gr/?p=413"},
             "faq_admission":                {"q": "εγγραφές γυμνάσιο",     "url": "https://ignatislask.sites.sch.gr/?cat=25"},
+            "faq_regulations":              {"q": "κανονισμός λειτουργίας", "url": "https://ignatislask.sites.sch.gr/?page_id=8"},
             "faq_contact_hours":            {"q": "ώρες λειτουργίας",      "url": "https://ignatislask.sites.sch.gr/?page_id=11"},
         }
 

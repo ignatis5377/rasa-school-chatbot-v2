@@ -131,6 +131,11 @@ rules:
   - intent: faq_admission
   - action: action_smart_faq
 
+- rule: Respond to Smart FAQs (Regulations)
+  steps:
+  - intent: faq_regulations
+  - action: action_smart_faq
+
 
 - rule: Respond to Student Role
   steps:
