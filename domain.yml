@@ -19,6 +19,9 @@ intents:
   - faq_attendance_info
   - faq_absences
   - faq_remedial_teaching
+  - faq_excursions
+  - faq_exams
+  - faq_admission
   - create_exam
   - search_website
   - inform_role_student

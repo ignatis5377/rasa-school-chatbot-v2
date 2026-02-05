@@ -1035,9 +1035,13 @@ class ActionSmartFaq(Action):
             "faq_model_exams_applications": {"q": "αιτήσεις πρότυπα",      "url": "https://ignatislask.sites.sch.gr/?cat=25"},
             "faq_model_exams_process":      {"q": "εισαγωγή πρότυπα",      "url": "https://ignatislask.sites.sch.gr/?p=2989"},
             "faq_model_exams_runners_up":   {"q": "πίνακας επιλαχόντων",   "url": "https://ignatislask.sites.sch.gr/?p=3561"},
-            "faq_attendance_info":          {"q": "φοίτηση πρότυπα",       "url": "https://ignatislask.sites.sch.gr/?cat=32"},
-            "faq_absences":                 {"q": "απουσίες μαθητών",      "url": "https://ignatislask.sites.sch.gr/?cat=32"},
-            "faq_remedial_teaching":        {"q": "ενισχυτική διδασκαλία", "url": "https://ignatislask.sites.sch.gr/?p=411"},
+            "faq_attendance_info":          {"q": "φοίτηση πρότυπα",       "url": "https://ignatislask.sites.sch.gr/?p=413"},
+            "faq_absences":                 {"q": "απουσίες μαθητών",      "url": "https://ignatislask.sites.sch.gr/?p=413"},
+            "faq_remedial_teaching":        {"q": "ενισχυτική διδασκαλία", "url": "https://ignatislask.sites.sch.gr/?cat=53"},
+            "faq_excursions":               {"q": "σχολικές εκδρομές",     "url": "https://ignatislask.sites.sch.gr/?cat=5"},
+            "faq_exams":                    {"q": "εξετάσεις γυμνάσιο",    "url": "https://ignatislask.sites.sch.gr/?p=413"},
+            "faq_admission":                {"q": "εγγραφές γυμνάσιο",     "url": "https://ignatislask.sites.sch.gr/?cat=25"},
+            "faq_contact_hours":            {"q": "ώρες λειτουργίας",      "url": "https://ignatislask.sites.sch.gr/?page_id=11"},
         }
 
         config = faq_map.get(intent)

@@ -116,6 +116,21 @@ rules:
   - intent: faq_remedial_teaching
   - action: action_smart_faq
 
+- rule: Respond to Smart FAQs (Excursions)
+  steps:
+  - intent: faq_excursions
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Exams)
+  steps:
+  - intent: faq_exams
+  - action: action_smart_faq
+
+- rule: Respond to Smart FAQs (Admission)
+  steps:
+  - intent: faq_admission
+  - action: action_smart_faq
+
 
 - rule: Respond to Student Role
   steps:
