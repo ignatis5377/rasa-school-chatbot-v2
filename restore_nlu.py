@@ -1,162 +1,10 @@
-version: "3.1"
 
-nlu:
-- intent: greet
-  examples: |
-    - γεια
-    - γεια σου
-    - καλημέρα
-    - καλησπέρα
-    - χαίρετε
-    - γεια χαρά
+import os
 
-- intent: goodbye
-  examples: |
-    - αντίο
-    - τα λέμε
-    - καλό βράδυ
-    - καλή συνέχεια
+file_path = "data/nlu.yml"
 
-- intent: bot_challenge
-  examples: |
-    - είσαι ρομπότ;
-    - είσαι αληθινός άνθρωπος;
-    - μιλάω με άνθρωπο;
-    - τι είσαι;
-
-- intent: ask_contact_info
-  examples: |
-    - ποιο είναι το τηλέφωνο του σχολείου;
-    - πώς μπορώ να επικοινωνήσω;
-    - τηλέφωνο γραμματείας
-    - email σχολείου
-    - δώσε μου το email
-    - διεύθυνση σχολείου
-    - ωράριο γραμματείας
-
-- intent: ask_absences_info
-  examples: |
-    - πόσες απουσίες μπορώ να κάνω;
-    - πώς δικαιολογώ απουσίες;
-    - όριο απουσιών
-    - θέλω να φέρω χαρτί γιατρού για απουσίες
-    - ενημέρωση για απουσίες
-
-- intent: ask_school_calendar
-  examples: |
-    - πότε κλείνουν τα σχολεία;
-    - αργίες σχολείου
-    - πότε έχουμε διακοπές;
-    - ημερολόγιο σχολικό
-
-- intent: create_exam
-  examples: |
-    - θέλω να φτιάξω ένα διαγώνισμα
-    - δημιουργία διαγωνίσματος
-    - φτιάξε μου ένα τεστ
-    - generator διαγωνισμάτων
-    - κάνε μου ένα διαγώνισμα
-    - παρήγαγε ένα τεστ
-    - φτιάξε διαγώνισμα φυσικής
-    - δημιουργία τεστ μαθηματικών
-    - δημιούργησε εξετάσεις
-    - Generative AI για διαγώνισμα
-    - φτιάξε θέματα
-    - θέλω να δημιουργήσω τεστ
-    - create new exam
-    - generate exam
-    - θελω διαγωνισμα
-    - θελω να κανω διαγωνισμα
-    - θελω τεστ
-    - δημιουργια διαγωνισματος
-    - φτιαξε διαγωνισμα
-    - κανε ενα τεστ
-
-
-- intent: inform
-  examples: |
-    - [Φυσική](subject)
-    - [Χημεία](subject)
-    - [Μαθηματικά](subject)
-    - [Ιστορία](subject)
-    - [Αρχαία](subject)
-    - [Λογοτεχνία](subject)
-    - [Γεωγραφία](subject)
-    - [φυσικη](subject)
-    - [χημεια](subject)
-    - [μαθηματικα](subject)
-    - [ιστορια](subject)
-    - [αρχαια](subject)
-    - [Α Γυμνασίου](grade)
-    - [Β Γυμνασίου](grade)
-    - [Γ Γυμνασίου](grade)
-    - [Α γυμνασίου](grade)
-    - [Β γυμνασίου](grade)
-    - [Γ γυμνασίου](grade)
-    - [Α τάξη](grade)
-    - [Β τάξη](grade)
-    - [Γ τάξη](grade)
-    - [α ταξη](grade)
-    - [β ταξη](grade)
-    - [γ ταξη](grade)
-    - [Πρώτη](grade)
-    - [Δευτέρα](grade)
-    - [Τρίτη](grade)
-    - [πρώτη](grade)
-    - [δευτέρα](grade)
-    - [τρίτη](grade)
-    - [πρωτη](grade)
-    - [δευτερα](grade)
-    - [τριτη](grade)
-    - [Πρωτη Γυμνασιου](grade)
-    - [Δευτερα Γυμνασιου](grade)
-    - [Τριτη Γυμνασιου](grade)
-    - [Α](grade)
-    - [Β](grade)
-    - [Γ](grade)
-    - [α](grade)
-    - [β](grade)
-    - [γ](grade)
-    - [Εύκολο](difficulty)
-    - [Μέτριο](difficulty)
-    - [Δύσκολο](difficulty)
-    - [ευκολο](difficulty)
-    - [μετριο](difficulty)
-    - [δυσκολο](difficulty)
-    - [5](num_questions)
-    - [10](num_questions)
-    - [3](num_questions)
-    - [1](num_questions)
-    - [ένα](num_questions)
-    - [ενα](num_questions)
-    - [δύο](num_questions)
-    - [δυο](num_questions)
-    - [τρία](num_questions)
-    - [τρια](num_questions)
-    - [τέσσερα](num_questions)
-    - [πέντε](num_questions)
-    - [μια](num_questions)
-    - [με απαντήσεις](include_answers)
-    - [χωρίς απαντήσεις](include_answers)
-    - [ναι](include_answers)
-    - [οχι](include_answers)
-
-- intent: ask_help
-  examples: |
-    - βοήθεια
-    - θέλω βοήθεια
-    - δεν ξέρω τι να κάνω
-    - τι μπορείς να κάνεις;
-    - πώς λειτουργείς;
-    - help
-    - Sos
-    - χρειάζομαι βοήθεια
-    - οδηγίες χρήσης
-    - τι επιλογές έχω;
-    - μπερδεύτηκα
-
-
-
+# The text to append. I am gathering this from previous context.
+restored_content = """
 - intent: upload_exam_material
   examples: |
     - θέλω να ανεβάσω αρχεία
@@ -351,3 +199,79 @@ nlu:
     - Πού αναφέρονται οι υποχρεώσεις των μαθητών;
     - Υπάρχουν κυρώσεις αν παραβιαστούν οι κανόνες;
     - Ο κανονισμός ισχύει και στις σχολικές δραστηριότητες;
+"""
+
+try:
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        content = f.read()
+
+    # Find the end of faq_contact_hours. 
+    # The last known good line before corruption is probably under faq_contact_hours
+    # We look for "- intent: upload_exam_material" or simply cut off after faq_contact_hours if possible.
+    
+    # Actually, searching for "intent: faq_contact_hours" and then finding the next intent usually works.
+    start_tag = "- intent: faq_contact_hours"
+    idx = content.find(start_tag)
+    
+    if idx == -1:
+        print("Reference point not found!")
+        exit(1)
+        
+    # Find the end of this block. It ends where the next intent starts (which is upload_exam_material).
+    # Since we are restoring from upload_exam_material onwards, we want to cut right before it.
+    
+    # Let's verify where upload_exam_material starts.
+    # If the file is corrupted, the text "upload_exam_material" might be intact (ASCII) but the Greek content inside might be broken.
+    # So we should find the start of `faq_contact_hours` and keep it, then find where `upload_exam_material` WOULD be.
+    
+    # Actually, checking the previous `view_file` (Step 881), `faq_contact_hours` is followed by `upload_exam_material`.
+    end_tag = "- intent: upload_exam_material"
+    idx_end = content.find(end_tag)
+    
+    if idx_end != -1:
+        print(f"Found cut-off point at {idx_end}. Truncating and appending...")
+        # Keep content up to (but not including) upload_exam_material
+        final_content = content[:idx_end] + restored_content
+    else:
+        # If we can't find it (maybe it's corrupted beyond recognition?),
+        # we can try to find the end of the last GOOD intent.
+        print("Couldn't find upload_exam_material tag. Trying fallback...")
+        # Fallback: Find end of faq_contact_hours listing.
+        # It ends with empty newlines usually.
+        # Let's count indents or look for the last known example line.
+        
+        # Harder to do reliably. Let's assume the intent TAG itself is preserved because it's english.
+        # If "intent: upload_exam_material" is missing, maybe "intent: upload_study_material" is there?
+        pass 
+        # For now, let's assume we can trigger off the start tag + some offset or just rewrite the file content if we had the FULL file.
+        # But we don't have the full file in memory.
+        
+        # Alternative: Just look for the LAST newline after faq_contact_hours examples.
+        # That's risky.
+        
+        # Let's just find "intent: faq_contact_hours" and iterate lines until we see "intent:" or EOF.
+        lines = content.splitlines()
+        cut_line = -1
+        for i, line in enumerate(lines):
+            if line.strip().startswith("- intent: faq_contact_hours"):
+                # Fast forward to next intent
+                for j in range(i+1, len(lines)):
+                     if lines[j].strip().startswith("- intent:"):
+                         cut_line = j
+                         break
+                break
+        
+        if cut_line != -1:
+             print(f"Found cut-off line at {cut_line}")
+             final_content = "\\n".join(lines[:cut_line]) + "\\n" + restored_content
+        else:
+            print("Could not find safe cut-off point.")
+            exit(1)
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(final_content)
+        
+    print("Restore complete.")
+
+except Exception as e:
+    print(f"Error: {e}")
