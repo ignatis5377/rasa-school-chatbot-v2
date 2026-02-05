@@ -17,8 +17,12 @@
     <p>Open the chat widget at the bottom right.</p>
 
     <script>!(function () {
-            // FIX: Clear session storage on load to restart conversation on refresh
+            // FIX: Nuclear clear of all storage to ensure fresh session
+            window.localStorage.clear();
             window.sessionStorage.clear();
+            localStorage.removeItem('chat_session');
+            localStorage.removeItem('userid');
+
 
             let e = document.createElement("script"),
                 t = document.head || document.getElementsByTagName("head")[0];
