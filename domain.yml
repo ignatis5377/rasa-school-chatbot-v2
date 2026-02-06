@@ -37,6 +37,7 @@ intents:
   - upload_exam_material
 
 
+entities:
   - subject
   - grade
   - difficulty
@@ -46,17 +47,6 @@ intents:
   - role
   - username
   - upload_link
-
-  - difficulty 
-    # Rasa doesn't support inline synonyms here for 'entities' list, 
-    # but we will add 'synonyms' section below if not present,
-    # OR we add them to NLU. 
-    # Actually, proper way is 'nlu.yml' synonym mapping OR entity mapping.
-    # Let's check NLU next.
-    # For now, I will just fix the Prompt above.
-  - file_path
-  - role
-  - username
 
 slots:
   query:
