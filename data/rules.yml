@@ -17,10 +17,7 @@ rules:
   - intent: ask_contact_info
   - action: utter_contact_info
 
-- rule: Answer absences info
-  steps:
-  - intent: ask_absences_info
-  - action: utter_absences_info
+
 
 - rule: Answer school calendar
   steps:
