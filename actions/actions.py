@@ -1439,3 +1439,61 @@ class ActionUploadStudyMaterial(Action):
             conn.close()
 
         return [SlotSet("upload_file_path", None), SlotSet("subject", None), SlotSet("grade", None)]
+
+class ActionHandleFallback(Action):
+    def name(self) -> Text:
+        return "action_handle_fallback"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+            
+        user_message = tracker.latest_message.get('text')
+        
+        # --- DYNAMIC SEARCH INTEGRATION ---
+        if user_message and len(user_message) > 3:
+            try:
+                import requests
+                # Search Posts
+                url_posts = f"https://ignatislask.sites.sch.gr/?rest_route=/wp/v2/posts&search={user_message}&per_page=3"
+                # Search Pages ensures we find 'Regulation' etc.
+                url_pages = f"https://ignatislask.sites.sch.gr/?rest_route=/wp/v2/pages&search={user_message}&per_page=3"
+                
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+                
+                posts = []
+                try:
+                    r1 = requests.get(url_posts, headers=headers, timeout=3, verify=False)
+                    if r1.status_code == 200: posts.extend(r1.json())
+                except: pass
+                
+                try:
+                    r2 = requests.get(url_pages, headers=headers, timeout=3, verify=False)
+                    if r2.status_code == 200: posts.extend(r2.json())
+                except: pass
+
+                if posts:
+                    message = "?e? e?µa? s??????? ?t? ?at??aﬂa, a??? ﬂ???a a?t? st? site:\n\n"
+                    # Dedup by link
+                    seen_links = set()
+                    count = 0
+                    for post in posts:
+                        if count >= 3: break
+                        link = post['link']
+                        if link not in seen_links:
+                            title = post['title']['rendered']
+                            message += f"- [{title}]({link})\n"
+                            seen_links.add(link)
+                            count += 1
+                    
+                    if count > 0:
+                        message += "\n?ta? a?t? p?? ????ate;"
+                        dispatcher.utter_message(text=message)
+                        from rasa_sdk.events import UserUtteranceReverted
+                        return [UserUtteranceReverted()]
+                        
+            except Exception as e:
+                print(f"Fallback Search Error: {e}")
+
+        dispatcher.utter_message(text="S????µ?, de? ?at??aﬂa. ?p??e?te ?a t? d?at?p?sete d?af??et???;")
+        return []
