@@ -1,4 +1,8 @@
-version: "3.1"
+
+import os
+
+# Full content of the file
+nlu_content = """version: "3.1"
 # Force UTF-8 Encoding Update
 
 nlu:
@@ -444,3 +448,9 @@ nlu:
     - αποτελέσματα επιλαχόντων
     - πότε βγαίνουν οι επιλαχόντες;
     - λίστα επιλαχόντων
+"""
+
+with open("data/nlu.yml", "w", encoding="utf-8") as f:
+    f.write(nlu_content)
+
+print("NLU file completely rebuilt with correct encoding.")
