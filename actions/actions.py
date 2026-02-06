@@ -1031,16 +1031,16 @@ class ActionSmartFaq(Action):
         
         # Configuration for Hybrid FAQs: Intent -> (Search Keyword, Fallback Link)
         faq_map = {
-            "faq_parent_briefing":          {"q": "ενημέρωση γονέων",      "url": "https://ignatislask.sites.sch.gr/?page_id=6"},
-            "faq_model_exams_applications": {"q": "αιτήσεις πρότυπα",      "url": "https://ignatislask.sites.sch.gr/?cat=25"},
-            "faq_model_exams_process":      {"q": "εισαγωγή πρότυπα",      "url": "https://ignatislask.sites.sch.gr/?p=2989"},
+            "faq_parent_briefing":          {"q": "ενημέρωση γονέων",      "cat": 10, "url": "https://ignatislask.sites.sch.gr/?page_id=6"},
+            "faq_model_exams_applications": {"q": "αιτήσεις πρότυπα",      "cat": 25, "url": "https://ignatislask.sites.sch.gr/?cat=25"},
+            "faq_model_exams_process":      {"q": "εισαγωγή πρότυπα",      "cat": 25, "url": "https://ignatislask.sites.sch.gr/?p=2989"},
             "faq_model_exams_runners_up":   {"q": "πίνακας επιλαχόντων",   "url": "https://ignatislask.sites.sch.gr/?p=3561"},
-            "faq_attendance_info":          {"q": "φοίτηση πρότυπα",       "url": "https://ignatislask.sites.sch.gr/?p=413"},
-            "faq_absences":                 {"q": "απουσίες μαθητών",      "url": "https://ignatislask.sites.sch.gr/?p=413"},
-            "faq_remedial_teaching":        {"q": "ενισχυτική διδασκαλία", "url": "https://ignatislask.sites.sch.gr/?cat=53"},
-            "faq_excursions":               {"q": "σχολικές εκδρομές",     "url": "https://ignatislask.sites.sch.gr/?cat=5"},
-            "faq_exams":                    {"q": "εξετάσεις γυμνάσιο",    "url": "https://ignatislask.sites.sch.gr/?p=413"},
-            "faq_admission":                {"q": "εγγραφές γυμνάσιο",     "url": "https://ignatislask.sites.sch.gr/?cat=25"},
+            "faq_attendance_info":          {"q": "φοίτηση πρότυπα",       "cat": 32, "url": "https://ignatislask.sites.sch.gr/?p=413"},
+            "faq_absences":                 {"q": "απουσίες μαθητών",      "cat": 32, "url": "https://ignatislask.sites.sch.gr/?p=413"},
+            "faq_remedial_teaching":        {"q": "ενισχυτική διδασκαλία", "cat": 53, "url": "https://ignatislask.sites.sch.gr/?cat=53"},
+            "faq_excursions":               {"q": "σχολικές εκδρομές",     "cat": 5,  "url": "https://ignatislask.sites.sch.gr/?cat=5"}, # 5 = Anakoinoseis (often used for excursions), checking specific cat if exists? 35 is Educational Excursions
+            "faq_exams":                    {"q": "εξετάσεις γυμνάσιο",    "cat": 32, "url": "https://ignatislask.sites.sch.gr/?p=413"},
+            "faq_admission":                {"q": "εγγραφές γυμνάσιο",     "cat": 25, "url": "https://ignatislask.sites.sch.gr/?cat=25"},
             "faq_regulations":              {"q": "κανονισμός λειτουργίας", "url": "https://ignatislask.sites.sch.gr/?page_id=8"},
             "faq_contact_hours":            {"q": "ώρες λειτουργίας",      "url": "https://ignatislask.sites.sch.gr/?page_id=11"},
         }
@@ -1052,23 +1052,33 @@ class ActionSmartFaq(Action):
             dispatcher.utter_message(text="Δεν βρήκα συγκεκριμένες πληροφορίες για αυτό.")
             return []
 
-        search_query = config["q"]
+        search_query = config.get("q")
+        category_id = config.get("cat") # Optional: specific category ID
         fallback_link = config["url"]
         
         # 1. Perform Search (Similar logic to ActionSearchArticles)
         search_results_text = ""
         try:
             import requests
-            # Wordpress REST API
-            url = f"https://ignatislask.sites.sch.gr/?rest_route=/wp/v2/posts&search={search_query}"
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+            
+            # Decide URL based on whether we have a category or just a search term
+            if category_id:
+                 # Fetch latest posts from specific category
+                 url = f"https://ignatislask.sites.sch.gr/?rest_route=/wp/v2/posts&categories={category_id}&per_page=3"
+                 search_label = "σχετικές ανακοινώσεις"
+            else:
+                 # Standard text search
+                 url = f"https://ignatislask.sites.sch.gr/?rest_route=/wp/v2/posts&search={search_query}&per_page=3"
+                 search_label = f"σχετικά άρθρα για '{search_query}'"
+
             response = requests.get(url, headers=headers, timeout=5, verify=False)
             
             if response.status_code == 200:
                 posts = response.json()
                 if posts:
-                    search_results_text = f"🔎 Βρήκα επίσης αυτά τα σχετικά άρθρα για '{search_query}':\n"
-                    # Top 3 results
+                    search_results_text = f"🔎 Βρήκα {search_label}:\n"
+                    # Top results (limit handled by URL param usually, but verify)
                     for post in posts[:3]:
                         title = post['title']['rendered']
                         link = post['link']
@@ -1076,7 +1086,6 @@ class ActionSmartFaq(Action):
                     search_results_text += "\n"
         except Exception as e:
             print(f"SmartFAQ Search Error: {e}")
-            # Silently fail search and just show the static link
             pass
 
         # 2. Construct Final Message
