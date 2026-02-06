@@ -37,12 +37,23 @@ intents:
   - upload_exam_material
 
 
-entities:
   - subject
   - grade
   - difficulty
   - num_questions
   - query
+  - file_path
+  - role
+  - username
+  - upload_link
+
+  - difficulty 
+    # Rasa doesn't support inline synonyms here for 'entities' list, 
+    # but we will add 'synonyms' section below if not present,
+    # OR we add them to NLU. 
+    # Actually, proper way is 'nlu.yml' synonym mapping OR entity mapping.
+    # Let's check NLU next.
+    # For now, I will just fix the Prompt above.
   - file_path
   - role
   - username
@@ -250,7 +261,7 @@ responses:
   - text: "Για ποια τάξη θέλετε το διαγώνισμα;"
 
   utter_ask_exam_subject:
-  - text: "Σε ποιο μάθημα να εξεταστείτε;"
+  - text: "Για ποιο μάθημα θέλετε να δημιουργήσετε το διαγώνισμα;"
 
   utter_ask_include_answers:
   - text: "Θέλετε να συμπεριληφθούν οι απαντήσεις;"
