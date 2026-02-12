@@ -48,3 +48,15 @@ services:
     volumes:
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+
+  admin-app:
+    build: .
+    entrypoint: []
+    command: streamlit run admin_app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./files:/app/files
+      - ./admin_app.py:/app/admin_app.py
+    restart: always

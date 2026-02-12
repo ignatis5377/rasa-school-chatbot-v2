@@ -13,3 +13,5 @@ python-docx
 websocket-client
 python-engineio==4.3.4
 python-socketio==5.7.2
+streamlit
+watchdog
