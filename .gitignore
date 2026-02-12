@@ -6,3 +6,4 @@ __pycache__/
 
 # Αγνοούμε τον φάκελο μοντέλων, καθώς το training γίνεται στο Docker
 models/
+data/questions.db
