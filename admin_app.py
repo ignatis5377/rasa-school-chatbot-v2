@@ -99,14 +99,62 @@ with col2:
                 st.error(f"Σφάλμα κατά την αποθήκευση: {e}")
 
 st.markdown("---")
-st.header("📊 Υπάρχουσες Ερωτήσεις (Τελευταίες 10)")
+st.markdown("---")
+st.header("📂 Περιήγηση Ερωτήσεων")
 
+# --- Sidebar Filters ---
+st.sidebar.header("🔍 Φίλτρα Αναζήτησης")
+
+# Get unique values for filters
 conn = sqlite3.connect(DB_PATH)
-df = conn.execute("SELECT id, subject, class_name, question_text, image_path FROM questions ORDER BY id DESC LIMIT 10").fetchall()
+subjects = [r[0] for r in conn.execute("SELECT DISTINCT subject FROM questions WHERE subject IS NOT NULL").fetchall()]
+grades = [r[0] for r in conn.execute("SELECT DISTINCT class_name FROM questions WHERE class_name IS NOT NULL").fetchall()]
+difficulties = [r[0] for r in conn.execute("SELECT DISTINCT difficulty FROM questions WHERE difficulty IS NOT NULL").fetchall()]
 conn.close()
 
-if df:
-    # Custom display or DataFrame
-    st.table(df)
-else:
-    st.write("Η βάση είναι ακόμα άδεια.")
+selected_subject = st.sidebar.selectbox("Μάθημα", ["Όλα"] + subjects)
+selected_grade = st.sidebar.selectbox("Τάξη", ["Όλα"] + grades)
+selected_difficulty = st.sidebar.selectbox("Δυσκολία", ["Όλα"] + difficulties)
+search_query = st.sidebar.text_input("Αναζήτηση Κειμένου", "")
+
+# --- Build Query ---
+query = "SELECT id, subject, class_name, difficulty, question_text, image_path FROM questions WHERE 1=1"
+params = []
+
+if selected_subject != "Όλα":
+    query += " AND subject = ?"
+    params.append(selected_subject)
+if selected_grade != "Όλα":
+    query += " AND class_name = ?"
+    params.append(selected_grade)
+if selected_difficulty != "Όλα":
+    query += " AND difficulty = ?"
+    params.append(selected_difficulty)
+if search_query:
+    query += " AND question_text LIKE ?"
+    params.append(f"%{search_query}%")
+
+query += " ORDER BY id DESC"
+
+# --- Fetch Data ---
+conn = sqlite3.connect(DB_PATH)
+try:
+    # Use pandas if available for better display, else raw list
+    import pandas as pd
+    df = pd.read_sql_query(query, conn, params=params)
+    
+    st.write(f"Βρέθηκαν **{len(df)}** ερωτήσεις.")
+    
+    if not df.empty:
+        # Display as interactive dataframe
+        st.dataframe(df, use_container_width=True)
+        
+        # Optional: Detailed View of selected row?
+        # For now, just the table is enough as per request.
+    else:
+        st.info("Δεν βρέθηκαν ερωτήσεις με αυτά τα κριτήρια.")
+        
+except Exception as e:
+    st.error(f"Error loading data: {e}")
+finally:
+    conn.close()
