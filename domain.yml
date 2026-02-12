@@ -240,7 +240,7 @@ responses:
   utter_school_calendar:
   - text: "Τα σχολεία κλείνουν για Χριστούγεννα στις 23/12 και για Πάσχα τη Μεγάλη Δευτέρα. Το διδακτικό έτος λήγει 30 Ιουνίου."
 
-  utter_ask_num_questions:
+  utter_ask_number_of_questions:
   - text: "Πόσες ερωτήσεις θέλετε να έχει το διαγώνισμα;"
 
   utter_ask_difficulty:
