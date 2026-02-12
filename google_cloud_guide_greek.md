@@ -108,3 +108,38 @@ sudo docker-compose restart nginx
 ```bash
 sudo docker-compose logs -f action-server
 ```
+
+### 7. Πρόβλημα "Expired Key" στο SSH
+Αν δείτε μήνυμα "invalid ssh key entry - expired key":
+*   Η Google δημιουργεί προσωρινά κλειδιά που λήγουν γρήγορα.
+*   **Λύση:** Κλείστε τελείως το μαύρο παράθυρο SSH και πατήστε ξανά το κουμπί **SSH**.
+*   **Λύση 2:** Αν επιμένει, κάντε **Reset** (Επανεκκίνηση) στο VM από το κουμπί "Reset" πάνω στην μπάρα του Google Cloud Console.
+
+### 8. Πρόβλημα "Bad Permissions" στο Κλειδί (Windows)
+Αν δείτε μήνυμα `WARNING: UNPROTECTED PRIVATE KEY FILE!`, σημαίνει ότι τα Windows δίνουν πρόσβαση σε πολλούς χρήστες στο αρχείο κλειδιού.
+**Λύση (PowerShell):**
+Τρέξτε αυτές τις εντολές στο PowerShell για να διορθώσετε τα δικαιώματα:
+```powershell
+# 1. Μετάβαση στο φάκελο .ssh
+cd $env:USERPROFILE\.ssh
+
+# 2. Αφαίρεση όλων των δικαιωμάτων
+icacls google_compute_engine /inheritance:r
+
+# 3. Ανάθεση δικαιωμάτων ΜΟΝΟ στον χρήστη σας
+icacls google_compute_engine /grant:r "$($env:USERNAME):(R)"
+```
+
+### 6. Εναλλακτική Πρόσβαση στο Admin App (Χωρίς SSH Tunnel)
+Αν σας δυσκολεύει το SSH Tunneling για να δείτε το Admin App (`streamlt`), μπορείτε να ανοίξετε την πόρτα 8501 στο Firewall.
+
+1.  Πηγαίνετε στο **Google Cloud Console** -> **VPC network** -> **Firewall**.
+2.  Πατήστε **Create Firewall Rule**.
+3.  Ονομάστε το `allow-streamlit`.
+4.  Στο **Targets**, επιλέξτε "All instances in the network".
+5.  Στο **Source IPv4 ranges**, βάλτε `0.0.0.0/0` (ή μόνο την IP του σπιτιού σας για ασφάλεια).
+6.  Στο **Protocols and ports**, τσεκάρετε το **tcp** και γράψτε `8501`.
+7.  Πατήστε **Create**.
+
+Τώρα μπορείτε να μπείτε απευθείας από τον browser σας:
+`http://104.155.53.205:8501`
