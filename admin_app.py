@@ -158,3 +158,31 @@ except Exception as e:
     st.error(f"Error loading data: {e}")
 finally:
     conn.close()
+
+# --- Delete Section ---
+st.markdown("---")
+with st.expander("🗑️ Διαγραφή Ερώτησης", expanded=False):
+    st.warning("Προσοχή! Η διαγραφή είναι οριστική.")
+    
+    # Reload connection for delete selector
+    conn = sqlite3.connect(DB_PATH)
+    all_questions = conn.execute("SELECT id, subject, question_text FROM questions ORDER BY id DESC").fetchall()
+    conn.close()
+    
+    # Format: "ID: Subject - Text..."
+    question_options = {q[0]: f"{q[0]}: {q[1]} - {q[2][:50]}..." for q in all_questions}
+    
+    selected_delete_id = st.selectbox("Επιλέξτε ερώτηση για διαγραφή:", options=list(question_options.keys()), format_func=lambda x: question_options[x])
+    
+    if st.button("Οριστική Διαγραφή ❌", type="primary"):
+        if selected_delete_id:
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                c = conn.cursor()
+                c.execute("DELETE FROM questions WHERE id = ?", (selected_delete_id,))
+                conn.commit()
+                conn.close()
+                st.success(f"Η ερώτηση {selected_delete_id} διαγράφηκε.")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Σφάλμα κατά τη διαγραφή: {e}")

@@ -18,7 +18,11 @@
 *   **Word Parser:** Αναλύει `.docx` αρχεία (Ερωτήσεις/Απαντήσεις) και εξάγει εικόνες.
 *   **PDF Generator:** Χρησιμοποιεί το `reportlab` (με γραμματοσειρά **DejaVuSans**) για να φτιάχνει διαγωνίσματα με Inline Answers.
 *   **Search Integration:** Συνδέει το bot με το **WordPress REST API** για αναζήτηση άρθρων.
+*   **Search Integration:** Συνδέει το bot με το **WordPress REST API** για αναζήτηση άρθρων.
 *   **Fallback Logic:** Μετράει τις αποτυχημένες προσπάθειες και κάνει reset μετά από 3 λάθη.
+
+### 3. Διαχείριση (Backend)
+*   **Admin App (`admin_app.py`):** Εφαρμογή Streamlit για άμεση εποπτεία της βάσης δεδομένων. Επιτρέπει φιλτράρισμα, αναζήτηση και προεπισκόπηση ερωτήσεων.
 
 ---
 
@@ -28,7 +32,7 @@
 
 ### 1. Τα Αρχεία Docker
 *   **`Dockerfile`:** Εγκαθιστά Python βιβλιοθήκες και εξασφαλίζει ότι το `DejaVuSans.ttf` είναι στη σωστή θέση (`/app/fonts/`) για να μην σπάνε τα PDF.
-*   **`docker-compose.yml`:** Σηκώνει 4 υπηρεσίες: Rasa, Action Server, Nginx, Certbot.
+*   **`docker-compose.yml`:** Σηκώνει **5 υπηρεσίες**: Rasa, Action Server, Nginx, Certbot, και **Admin App**.
 
 ### 2. Volumes
 Ορίσαμε μόνιμους τόμους για να μην χάνονται τα αρχεία:
