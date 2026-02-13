@@ -274,8 +274,11 @@ def check_user_access(tracker: Tracker) -> bool:
     print(f"DEBUG AUTH (Latest): Role={user_data.get('role')}, User={user_data.get('username')}")
     
     # Check Metadata directly
-    # Restore Original Logic: 'member' or 'username' presence
-    if user_data.get("role") == "member" or user_data.get("username"):
+    # LOGIC FIX: 'member' conceptually includes teachers/admins. 
+    # If the exact string is 'teacher', the old check (role=='member') failed if username was missing.
+    # We allow specific roles OR presence of username.
+    role = user_data.get("role")
+    if role in ["member", "teacher", "administrator", "admin", "editor"] or user_data.get("username"):
         return True
 
     # 2. Deep Scan: Check session history (Crucial for Webchat)
@@ -290,7 +293,7 @@ def check_user_access(tracker: Tracker) -> bool:
         role = evt_user_data.get("role")
         username = evt_user_data.get("username")
         
-        if role == "member" or username:
+        if role in ["member", "teacher", "administrator", "admin", "editor"] or username:
             print(f"DEBUG AUTH: Found auth in history! Role={role}")
             return True
             
