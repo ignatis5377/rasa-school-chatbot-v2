@@ -5,6 +5,9 @@ stories:
 - story: harry path
   steps:
   - intent: greet
+    entities:
+    - role
+    - username
   - action: utter_greet
   - intent: goodbye
   - action: utter_goodbye
