@@ -20,6 +20,7 @@ services:
     user: root
     environment:
       - SANIC_HOST=0.0.0.0
+      - PYTHONUNBUFFERED=1
     ports:
       - "5055:5055"
     volumes:
