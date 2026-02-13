@@ -273,8 +273,15 @@ def check_user_access(tracker: Tracker) -> bool:
     print(f"DEBUG AUTH (Latest): Role={user_data.get('role')}, User={user_data.get('username')}")
     
     # Check Metadata directly
-    if user_data.get("role") == "member" or user_data.get("username"):
+    role = user_data.get("role")
+    if role and role.lower() in ["member", "teacher", "administrator", "admin", "editor"]:
         return True
+    
+    # Also valid if just username is present? (Implies logged in?)
+    # user_data.get("username") might be enough for general access, but let's be strict for sensitive actions if needed.
+    # For now, let's keep it safe.
+    if user_data.get("username"):
+         return True
 
     # 🚨 SECURITY FIX: Slot validation removed. 
     # We now strictly require metadata from the frontend.
@@ -306,10 +313,8 @@ def check_user_access(tracker: Tracker) -> bool:
 
         
 
-        if role == "member" or username:
-
+        if role and role.lower() in ["member", "teacher", "administrator", "admin", "editor"]:
             print(f"DEBUG AUTH: Found auth in history! Role={role}")
-
             return True
 
             
