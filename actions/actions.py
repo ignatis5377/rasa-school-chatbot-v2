@@ -278,6 +278,14 @@ def check_user_access(tracker: Tracker) -> bool:
     if user_data.get("role") == "member" or user_data.get("username"):
         return True
 
+    # 🚨 FALLBACK: Check Slots (Matches "Yesterday's" behavior)
+    # If connection drops or metadata is missing, trust the conversation context 
+    # if the user has explicitly stated their role and we trust them.
+    slot_role = tracker.get_slot("role")
+    if slot_role and slot_role.lower() in ["member", "teacher", "administrator", "admin", "editor"]:
+         print(f"DEBUG AUTH: Found role in SLOT: {slot_role} (Fallback)")
+         return True
+
     # 2. Deep Scan: Check session history (Crucial for Webchat)
     # Webchat often sends metadata only ONCE at the start.
     print("DEBUG AUTH: Scanning history for metadata...")
