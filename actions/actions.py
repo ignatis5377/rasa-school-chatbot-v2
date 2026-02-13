@@ -2497,8 +2497,8 @@ class ActionCheckCreateExamPermissions(Action):
         return "action_check_create_exam_permissions"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        role = tracker.get_slot("role")
-        if role == "teacher":
+        # Use the central, secure check function (Validates Metadata OR Payload Slot)
+        if check_user_access(tracker):
             return [FollowupAction("exam_form")]
         else:
             dispatcher.utter_message(text="Δυστυχώς μόνο εκπαιδευτικοί μπορούν να δημιουργούν διαγωνίσματα.")
