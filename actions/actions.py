@@ -281,6 +281,16 @@ def check_user_access(tracker: Tracker) -> bool:
     if role in ["member", "teacher", "administrator", "admin", "editor"] or user_data.get("username"):
         return True
 
+
+
+    # 🚨 FALLBACK: Trust the Slot (Secure if Slot is set via Payload)
+    # Since we confirmed NLU doesn't extract 'role' from text, 
+    # the only way to get this slot is via the Widget Payload.
+    slot_role = tracker.get_slot("role")
+    if slot_role and slot_role.lower() in ["member", "teacher", "administrator", "admin", "editor"]:
+         print(f"DEBUG AUTH: Found role in SLOT: {slot_role} (Fallback)")
+         return True
+
     # 2. Deep Scan: Check session history (Crucial for Webchat)
     # Webchat often sends metadata only ONCE at the start.
     print("DEBUG AUTH: Scanning history for metadata...")
