@@ -148,8 +148,6 @@ nlu:
     - [μια](num_questions)
     - [με απαντήσεις](include_answers)
     - [χωρίς απαντήσεις](include_answers)
-    - [ναι](include_answers)
-    - [οχι](include_answers)
 
 - intent: ask_help
   examples: |
