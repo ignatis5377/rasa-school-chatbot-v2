@@ -2237,6 +2237,8 @@ class ActionProvideStudyMaterial(Action):
         # Database Query
         # FIX: Point to the correct DB (same as Upload)
         DB_PATH = "data/school_db.sqlite"
+        import os
+        print(f"DEBUG PATH: CWD={os.getcwd()} DB_ABS={os.path.abspath(DB_PATH)} Exists={os.path.exists(DB_PATH)}")
         conn = sqlite3.connect(DB_PATH)
 
         c = conn.cursor()
@@ -2522,9 +2524,13 @@ class ActionUploadStudyMaterialFinal(Action):
             return []
             
         # Clean text
+        # Clean text (Standardized with Provide Action)
+        # Clean text (Standardized with Provide Action)
         def clean_text(t):
-             if not t: return ""
-             rep = {'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω'}
+             # Expanded if lacementnlist to match ActionProvideStudyMaterial
+             rep ot t: return ""','ϊ':'ι','ϋ':'υ','ς':'σ
+             # Expanded replacement list to match ActionProvideStudyMaterial
+             rep = {'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω','ϊ':'ι','ϋ':'υ','ς':'σ'}
              s = t.lower()
              for k,v in rep.items(): s = s.replace(k,v)
              return s.capitalize()
