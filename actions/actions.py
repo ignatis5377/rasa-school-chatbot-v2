@@ -2241,17 +2241,16 @@ class ActionProvideStudyMaterial(Action):
 
         c = conn.cursor()
 
-        
-
-        # Use LIKE for subject to be flexible
-
-        c.execute("SELECT title, url FROM study_materials WHERE subject LIKE ? AND grade = ?", (f"%{subj_clean}%", grade_key))
-
-        rows = c.fetchall()
-
-        
-
-        conn.close()
+        try:
+            # Use LIKE for subject to be flexible
+            c.execute("SELECT title, url FROM study_materials WHERE subject LIKE ? AND grade = ?", (f"%{subj_clean}%", grade_key))
+            rows = c.fetchall()
+        except sqlite3.OperationalError:
+            # Table might not exist yet if no uploads have happened
+            print("DEBUG STUDY: Table 'study_materials' missing or empty.")
+            rows = []
+        finally:
+            conn.close()
 
 
 
