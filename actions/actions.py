@@ -261,6 +261,7 @@ except Exception as e:
     print(f"DEBUG: Failed to load font: {e}")
 
 
+
 def check_user_access(tracker: Tracker) -> bool:
     """
     Checks if the user is authenticated via Metadata sent from the Frontend.
@@ -273,54 +274,27 @@ def check_user_access(tracker: Tracker) -> bool:
     print(f"DEBUG AUTH (Latest): Role={user_data.get('role')}, User={user_data.get('username')}")
     
     # Check Metadata directly
-    role = user_data.get("role")
-    if role and role.lower() in ["member", "teacher", "administrator", "admin", "editor"]:
+    # Restore Original Logic: 'member' or 'username' presence
+    if user_data.get("role") == "member" or user_data.get("username"):
         return True
-    
-    # Also valid if just username is present? (Implies logged in?)
-    # user_data.get("username") might be enough for general access, but let's be strict for sensitive actions if needed.
-    # For now, let's keep it safe.
-    if user_data.get("username"):
-         return True
-
-    # 🚨 SECURITY FIX: Slot validation removed. 
-    # We now strictly require metadata from the frontend.
 
     # 2. Deep Scan: Check session history (Crucial for Webchat)
     # Webchat often sends metadata only ONCE at the start.
     print("DEBUG AUTH: Scanning history for metadata...")
     for i, event in enumerate(reversed(tracker.events)):
-        # DEBUG: Print every event to see what's going on
-        evt_type = event.get("event")
-        evt_meta = event.get("metadata")
-        if evt_meta:
-             print(f"DEBUG EVENT [{i}] {evt_type}: HAS METADATA: {evt_meta}")
-        
-
         # Check 'user' events and 'session_started' events
-
         evt_metadata = event.get("metadata", {})
-
         if not evt_metadata: continue
-
         
-
         evt_user_data = evt_metadata.get("customData", {}) or evt_metadata
-
         role = evt_user_data.get("role")
-
         username = evt_user_data.get("username")
-
         
-
-        if role and role.lower() in ["member", "teacher", "administrator", "admin", "editor"]:
+        if role == "member" or username:
             print(f"DEBUG AUTH: Found auth in history! Role={role}")
             return True
-
             
-
     print("DEBUG AUTH: No auth found in history.")
-
     return False
 
 
