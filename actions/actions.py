@@ -2525,10 +2525,7 @@ class ActionUploadStudyMaterialFinal(Action):
             
         # Clean text
         # Clean text (Standardized with Provide Action)
-        # Clean text (Standardized with Provide Action)
         def clean_text(t):
-             # Expanded if lacementnlist to match ActionProvideStudyMaterial
-             rep ot t: return ""','ϊ':'ι','ϋ':'υ','ς':'σ
              # Expanded replacement list to match ActionProvideStudyMaterial
              rep = {'ά':'α','έ':'ε','ή':'η','ί':'ι','ό':'ο','ύ':'υ','ώ':'ω','ϊ':'ι','ϋ':'υ','ς':'σ'}
              s = t.lower()
