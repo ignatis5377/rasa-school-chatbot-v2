@@ -2234,6 +2234,9 @@ class ActionProvideStudyMaterial(Action):
 
         # Database Query
 
+        # Database Query
+        # FIX: Point to the correct DB (same as Upload)
+        DB_PATH = "data/school_db.sqlite"
         conn = sqlite3.connect(DB_PATH)
 
         c = conn.cursor()
@@ -2352,6 +2355,8 @@ class ActionUploadStudyMaterial(Action):
 
         # Need current count to increment
 
+        # Need current count to increment
+        DB_PATH = "data/school_db.sqlite"
         conn = sqlite3.connect(DB_PATH)
 
         c = conn.cursor()
@@ -2534,7 +2539,7 @@ class ActionUploadStudyMaterialFinal(Action):
         else: grade_key = grade_clean
 
         import sqlite3
-        DB_PATH = "school_db.sqlite"
+        DB_PATH = "data/school_db.sqlite"
         if not os.path.exists(DB_PATH):
              # Try to init or fail gracefully
              pass
