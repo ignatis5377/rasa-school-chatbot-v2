@@ -215,6 +215,13 @@ responses:
   - text: "Παρακαλώ δώστε μου τον σύνδεσμο (URL) του υλικού."
   utter_greet:
   - text: "Γειά σας! Ειστε μαθητής, γονέας ή εκπαιδευτικός του σχολείου?"
+    buttons:
+    - title: "Μαθητής"
+      payload: "/inform_role_student"
+    - title: "Γονέας"
+      payload: "/inform_role_parent"
+    - title: "Εκπαιδευτικός"
+      payload: "/inform_role_teacher"
 
   utter_greet_student:
   - text: "Μπορείς να αναζητήσεις υλικό για διάβασμα για το μάθημα που θες ή όποια άλλη πληροφορία για την λειτουργία του σχολείου."

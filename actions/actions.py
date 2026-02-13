@@ -2476,7 +2476,10 @@ class ActionVerifyRole(Action):
             role = "teacher"
             dispatcher.utter_message(response="utter_greet_teacher")
             
-        return [SlotSet("role", role)]
+        # SECURITY FIX: Do NOT set the 'role' slot based on text input.
+        # Roles must only be set via trusted Metadata/Payloads from the widget.
+        # This prevents guests from bypassing auth by saying "I am a teacher".
+        return []
 
 class ActionCheckStudyMaterialUploadPermissions(Action):
     def name(self) -> Text:
