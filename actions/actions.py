@@ -1874,7 +1874,7 @@ class ActionCreateExamNew(Action):
 
             file_name = os.path.basename(filepath)
 
-            public_url = f"https://104.155.53.205.nip.io/files/generated_exams/{file_name}"
+            public_url = f"https://92.5.6.135.nip.io/files/generated_exams/{file_name}"
 
             
 
@@ -2235,8 +2235,8 @@ class ActionProvideStudyMaterial(Action):
         # Database Query
 
         # Database Query
-        # FIX: Point to the correct DB (same as Upload)
-        DB_PATH = "data/school_db.sqlite"
+        # FIX: Point to the correct DB (same as main init)
+        DB_PATH = "data/questions.db"
         import os
         print(f"DEBUG PATH: CWD={os.getcwd()} DB_ABS={os.path.abspath(DB_PATH)} Exists={os.path.exists(DB_PATH)}")
         conn = sqlite3.connect(DB_PATH)
@@ -2357,7 +2357,7 @@ class ActionUploadStudyMaterial(Action):
         # Need current count to increment
 
         # Need current count to increment
-        DB_PATH = "data/school_db.sqlite"
+        DB_PATH = "data/questions.db"
         conn = sqlite3.connect(DB_PATH)
 
         c = conn.cursor()
